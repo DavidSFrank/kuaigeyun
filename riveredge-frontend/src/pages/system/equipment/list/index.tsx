@@ -9,9 +9,10 @@
  */
 
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ActionType, ProColumns, ProFormText, ProFormTextArea, ProFormSwitch, ProFormSelect, ProFormDatePicker, ProFormDigit, ProFormJsonSchema } from '@ant-design/pro-components';
 import { App, Popconfirm, Button, Tag, Space, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, HistoryOutlined } from '@ant-design/icons';
 import { UniTable } from '../../../../components/uni-table';
 import { ListPageTemplate, FormModalTemplate, DetailDrawerTemplate, MODAL_CONFIG, DRAWER_CONFIG } from '../../../../components/layout-templates';
 import {
@@ -30,6 +31,7 @@ import {
  */
 const EquipmentListPage: React.FC = () => {
   const { message: messageApi } = App.useApp();
+  const navigate = useNavigate();
   const actionRef = useRef<ActionType>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   
@@ -273,6 +275,14 @@ const EquipmentListPage: React.FC = () => {
             onClick={() => handleEdit(record)}
           >
             编辑
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            icon={<HistoryOutlined />}
+            onClick={() => navigate(`/system/equipment/${record.uuid}/trace`)}
+          >
+            追溯
           </Button>
           <Popconfirm
             title="确定要删除这个设备吗？"
