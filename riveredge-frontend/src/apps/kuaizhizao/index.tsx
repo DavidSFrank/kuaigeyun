@@ -7,8 +7,9 @@ import { Routes, Route } from 'react-router-dom';
 
 // 计划管理页面
 import DemandManagementPage from './pages/plan-management/demand-management';
-import MRPComputationPage from './pages/plan-management/mrp-computation';
-import LRPComputationPage from './pages/plan-management/lrp-computation';
+// TODO: MRP和LRP已合并为统一需求计算，相关页面已删除
+// import MRPComputationPage from './pages/plan-management/mrp-computation';
+// import LRPComputationPage from './pages/plan-management/lrp-computation';
 import ProductionPlansPage from './pages/plan-management/production-plans';
 import SchedulingPage from './pages/plan-management/scheduling';
 
@@ -25,8 +26,9 @@ import PurchaseOrdersPage from './pages/purchase-management/purchase-orders';
 import PurchaseReceiptsPage from './pages/purchase-management/purchase-receipts';
 
 // 销售管理页面
-import SalesForecastsPage from './pages/sales-management/sales-forecasts';
-import SalesOrdersPage from './pages/sales-management/sales-orders';
+// TODO: 销售预测和销售订单已合并为统一需求管理，相关页面已删除
+// import SalesForecastsPage from './pages/sales-management/sales-forecasts';
+// import SalesOrdersPage from './pages/sales-management/sales-orders';
 import SalesDeliveriesPage from './pages/sales-management/sales-deliveries';
 
 // 质量管理页面
@@ -74,8 +76,9 @@ const KuaizhizaoApp: React.FC = () => {
     <Routes>
       {/* 计划管理路由 */}
       <Route path="plan-management/demand-management" element={<DemandManagementPage />} />
-      <Route path="plan-management/mrp-computation" element={<MRPComputationPage />} />
-      <Route path="plan-management/lrp-computation" element={<LRPComputationPage />} />
+      {/* TODO: MRP和LRP路由已移除，已合并为统一需求计算 */}
+      {/* <Route path="plan-management/mrp-computation" element={<MRPComputationPage />} /> */}
+      {/* <Route path="plan-management/lrp-computation" element={<LRPComputationPage />} /> */}
       <Route path="plan-management/production-plans" element={<ProductionPlansPage />} />
       <Route path="plan-management/scheduling" element={<SchedulingPage />} />
 
@@ -96,8 +99,9 @@ const KuaizhizaoApp: React.FC = () => {
       <Route path="production-execution/exception-statistics" element={<ExceptionStatisticsPage />} />
 
       {/* 销售管理路由 */}
-      <Route path="sales-management/sales-forecasts" element={<SalesForecastsPage />} />
-      <Route path="sales-management/sales-orders" element={<SalesOrdersPage />} />
+      {/* TODO: 销售预测和销售订单路由已移除，已合并为统一需求管理 */}
+      {/* <Route path="sales-management/sales-forecasts" element={<SalesForecastsPage />} /> */}
+      {/* <Route path="sales-management/sales-orders" element={<SalesOrdersPage />} /> */}
       <Route path="sales-management/sales-deliveries" element={<SalesDeliveriesPage />} />
 
       {/* 质量管理路由 */}

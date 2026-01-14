@@ -117,6 +117,7 @@ class ProductionPlanItemResponse(ProductionPlanItemBase):
 
 # === MRP运算结果（已废弃） ===
 # ⚠️ 已废弃：根据《☆ 用户使用全场景推演.md》的设计理念，MRP和LRP已合并为统一的需求计算模型
+# TODO: 将在统一需求计算Schema中重新实现，相关API路由已注释
 
 class MRPResultBase(BaseSchema):
     """MRP运算结果基础schema"""
@@ -164,6 +165,7 @@ class MRPResultListResponse(MRPResultResponse):
 
 # === LRP运算结果（已废弃） ===
 # ⚠️ 已废弃：根据《☆ 用户使用全场景推演.md》的设计理念，MRP和LRP已合并为统一的需求计算模型
+# TODO: 将在统一需求计算Schema中重新实现，相关API路由已注释
 
 class LRPResultBase(BaseSchema):
     """LRP运算结果基础schema"""
@@ -213,6 +215,7 @@ class LRPResultListResponse(LRPResultResponse):
 
 # === MRP/LRP运算参数和结果（已废弃） ===
 # ⚠️ 已废弃：根据《☆ 用户使用全场景推演.md》的设计理念，MRP和LRP已合并为统一的需求计算模型
+# TODO: 将在统一需求计算Schema中重新实现，相关API路由已注释
 
 class MRPComputationRequest(BaseSchema):
     """MRP运算请求"""
