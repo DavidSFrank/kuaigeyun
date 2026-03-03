@@ -13,15 +13,29 @@
     <link rel="preconnect" href="https://cdn.svar.dev" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.svar.dev" />
 
-    <!-- SVAR 甘特图图标字体：分割线左右箭头、菜单图标等 -->
-    <link rel="stylesheet" href="https://cdn.svar.dev/fonts/wxi/wx-icons.css" />
+    <!-- SVAR 甘特图图标字体：异步加载，不阻塞登录首屏（进入甘特图等页面时再加载） -->
+    <link rel="stylesheet" href="https://cdn.svar.dev/fonts/wxi/wx-icons.css" media="print" onload="this.media='all'" />
 
     <!-- 性能优化：预加载关键字体（已移除，字体文件不存在且未使用） -->
     <!-- <link rel="preload" href="/fonts/antd-font.woff2" as="font" type="font/woff2" crossorigin /> -->
 </head>
 
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <!-- 首屏占位：在 React 加载前即显示，提升 FCP 感知 -->
+        <div id="app-loading" style="display:flex;align-items:center;justify-content:center;background:#fff;color:#666;font-family:system-ui,sans-serif;font-size:16px;">
+            <div style="text-align:center;">
+                <div style="width:48px;height:48px;margin:0 auto 16px;border:3px solid rgba(0,0,0,0.08);border-top-color:#1890ff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                <span>加载中...</span>
+            </div>
+        </div>
+    </div>
+    <style>
+      html,body{margin:0;padding:0;height:100%;box-sizing:border-box}
+      *{box-sizing:border-box}
+      #app-loading{position:fixed;inset:0}
+      @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
     <script type="module" src="./main.tsx"></script>
 </body>
 

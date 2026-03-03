@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>快格轻制造 - 登录</title>
+
+    <meta name="theme-color" content="#141414" />
+
+    <!-- 性能优化：预连接 API -->
+    <link rel="preconnect" href="https://cdn.svar.dev" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.svar.dev" />
+
+    <!-- wx-icons 异步加载，登录页不依赖甘特图 -->
+    <link rel="stylesheet" href="https://cdn.svar.dev/fonts/wxi/wx-icons.css" media="print" onload="this.media='all'" />
+</head>
+
+<body>
+    <div id="root" data-login-mpa="true">
+        <!-- 首屏占位：在 React 加载前即显示，提升 FCP 感知 -->
+        <div id="app-loading" style="display:flex;align-items:center;justify-content:center;background:#fff;color:#666;font-family:system-ui,sans-serif;font-size:16px;">
+            <div style="text-align:center;">
+                <div style="width:48px;height:48px;margin:0 auto 16px;border:3px solid rgba(0,0,0,0.08);border-top-color:#1890ff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                <span>加载中...</span>
+            </div>
+        </div>
+    </div>
+    <style>
+      html,body{margin:0;padding:0;height:100%;box-sizing:border-box}
+      *{box-sizing:border-box}
+      #app-loading{position:fixed;inset:0}
+      @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+    <script type="module" src="./login.tsx"></script>
+</body>
+
+</html>
