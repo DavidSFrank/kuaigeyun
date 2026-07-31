@@ -3,7 +3,9 @@
  */
 
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { normalizeCadSvg } from '../../utils/cad2dFileLoader';
+import { parseSvgViewBox } from '../../utils/previewMarkupTypes';
+import { usePreviewMarkup } from '../preview-markup/PreviewMarkupContext';
+import { PreviewMarkupLayer } from '../preview-markup/PreviewMarkupLayer';
 
 export type DwgSvgViewerRef = {
   zoomIn: () => void;
@@ -21,22 +23,10 @@ const MIN_SCALE = 0.05;
 const MAX_SCALE = 40;
 const ZOOM_FACTOR = 1.2;
 
-function getSvgIntrinsicSize(svg: string): { width: number; height: number } | null {
-  const viewBoxMatch = svg.match(/viewBox=["']([^"']+)["']/i);
-  if (viewBoxMatch) {
-    const parts = viewBoxMatch[1].trim().split(/[\s,]+/).map(Number);
-    if (parts.length >= 4 && parts[2] > 0 && parts[3] > 0) {
-      return { width: parts[2], height: parts[3] };
-    }
-  }
-  const widthMatch = svg.match(/\bwidth=["']([\d.]+)/i);
-  const heightMatch = svg.match(/\bheight=["']([\d.]+)/i);
-  if (widthMatch && heightMatch) {
-    const width = Number(widthMatch[1]);
-    const height = Number(heightMatch[1]);
-    if (width > 0 && height > 0) return { width, height };
-  }
-  return null;
+function getSvgIntrinsicSize(svg: string): { width: number; height: number; viewBox: string } | null {
+  const parsed = parseSvgViewBox(svg);
+  if (!parsed) return null;
+  return { width: parsed.width, height: parsed.height, viewBox: parsed.viewBox };
 }
 
 export const DwgSvgViewer = forwardRef<DwgSvgViewerRef, DwgSvgViewerProps>(function DwgSvgViewer(
@@ -47,6 +37,8 @@ export const DwgSvgViewer = forwardRef<DwgSvgViewerRef, DwgSvgViewerProps>(funct
   const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const markup = usePreviewMarkup();
+  const panMode = !markup || markup.tool === 'pan';
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -140,14 +132,21 @@ export const DwgSvgViewer = forwardRef<DwgSvgViewerRef, DwgSvgViewerProps>(funct
     return () => container.removeEventListener('wheel', onWheel);
   }, []);
 
+  useEffect(() => {
+    if (!svg || imageDataUrl) return;
+    const parsed = parseSvgViewBox(svg);
+    markup?.setViewBox(parsed?.viewBox ?? null);
+  }, [svg, imageDataUrl, markup]);
+
   const onPointerDown = (e: React.PointerEvent) => {
+    if (!panMode) return;
     dragRef.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
     setDragging(true);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current) return;
+    if (!panMode || !dragRef.current) return;
     const dx = e.clientX - dragRef.current.x;
     const dy = e.clientY - dragRef.current.y;
     setOffset({ x: dragRef.current.ox + dx, y: dragRef.current.oy + dy });
@@ -158,8 +157,7 @@ export const DwgSvgViewer = forwardRef<DwgSvgViewerRef, DwgSvgViewerProps>(funct
     setDragging(false);
   };
 
-  const normalizedSvg = svg ? normalizeCadSvg(svg) : '';
-  const svgSize = normalizedSvg ? getSvgIntrinsicSize(normalizedSvg) : null;
+  const svgSize = svg ? getSvgIntrinsicSize(svg) : null;
 
   return (
     <div
@@ -171,7 +169,7 @@ export const DwgSvgViewer = forwardRef<DwgSvgViewerRef, DwgSvgViewerProps>(funct
         minHeight: 280,
         overflow: 'hidden',
         background: '#fffef5',
-        cursor: dragging ? 'grabbing' : 'grab',
+        cursor: panMode ? (dragging ? 'grabbing' : 'grab') : 'default',
         touchAction: 'none',
         position: 'relative',
       }}
@@ -199,17 +197,26 @@ export const DwgSvgViewer = forwardRef<DwgSvgViewerRef, DwgSvgViewerProps>(funct
             style={{ display: 'block', maxWidth: 'none' }}
           />
         ) : (
-          <div
-            className="cad2d-svg-host"
-            style={{
-              display: 'block',
-              lineHeight: 0,
-              width: svgSize?.width,
-              height: svgSize?.height,
-            }}
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: normalizedSvg }}
-          />
+          <div style={{ position: 'relative', width: svgSize?.width, height: svgSize?.height }}>
+            <div
+              className="cad2d-svg-host"
+              style={{
+                display: 'block',
+                lineHeight: 0,
+                width: svgSize?.width,
+                height: svgSize?.height,
+              }}
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: svg ?? '' }}
+            />
+            {svgSize ? (
+              <PreviewMarkupLayer
+                viewBox={svgSize.viewBox}
+                width={svgSize.width}
+                height={svgSize.height}
+              />
+            ) : null}
+          </div>
         )}
       </div>
     </div>
