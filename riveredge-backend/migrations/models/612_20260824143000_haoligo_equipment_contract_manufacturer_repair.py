@@ -1,4 +1,4 @@
-"""好力 GO — 设备合同/应付款 manufacturer 迁移收尾（611 失败后的 idempotent 补跑）。"""
+"""好力 GO — manufacturer 迁移最终收尾（不依赖 supplier 旧列）。"""
 
 from tortoise import BaseDBAsyncClient
 
@@ -24,14 +24,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
                 NOW(),
                 NOW(),
                 'EQC-F-' || c."id"::text,
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1 FROM information_schema.columns
-                        WHERE table_name = 'haoligo_finance_equipment_contract'
-                          AND column_name = 'supplier_name'
-                    ) THEN COALESCE(NULLIF(TRIM(c."supplier_name"), ''), '历史合同厂商-' || c."id"::text)
-                    ELSE '历史合同厂商-' || c."id"::text
-                END
+                '历史合同厂商-' || c."id"::text
             FROM "haoligo_finance_equipment_contract" c
             WHERE c."manufacturer_id" IS NULL
               AND NOT EXISTS (
@@ -69,14 +62,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
                 NOW(),
                 NOW(),
                 'EQP-F-' || p."id"::text,
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1 FROM information_schema.columns
-                        WHERE table_name = 'haoligo_finance_equipment_payable'
-                          AND column_name = 'supplier_name'
-                    ) THEN COALESCE(NULLIF(TRIM(p."supplier_name"), ''), '历史应付款厂商-' || p."id"::text)
-                    ELSE '历史应付款厂商-' || p."id"::text
-                END
+                '历史应付款厂商-' || p."id"::text
             FROM "haoligo_finance_equipment_payable" p
             WHERE p."manufacturer_id" IS NULL
               AND NOT EXISTS (
