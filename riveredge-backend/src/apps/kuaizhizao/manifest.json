@@ -3921,6 +3921,16 @@
       "config_section": "quality_inspection"
     },
     {
+      "node_key": "rework_order_inventory_verify",
+      "entity_type": "rework_order",
+      "resource": "kuaizhizao:rework-order",
+      "name": "库存验证返工审核",
+      "template": "inventory_verify",
+      "config_category": "production",
+      "config_section": "production_work",
+      "business_type": "inventory_verify"
+    },
+    {
       "node_key": "rework_order",
       "entity_type": "rework_order",
       "resource": "kuaizhizao:rework-order",
@@ -3962,7 +3972,7 @@
       "entity_type": "quality_complaint",
       "resource": "kuaizhizao:quality-complaint",
       "name": "质量投诉审核",
-      "template": "simple",
+      "template": "complaint_iqc",
       "config_category": "quality",
       "config_section": "quality_complaint",
       "business_type": "iqc_incoming"
@@ -3972,7 +3982,7 @@
       "entity_type": "quality_complaint",
       "resource": "kuaizhizao:quality-complaint",
       "name": "质量投诉审核产线来料",
-      "template": "simple",
+      "template": "complaint_line",
       "config_category": "quality",
       "config_section": "quality_complaint",
       "business_type": "line_incoming"
@@ -3982,7 +3992,7 @@
       "entity_type": "quality_complaint",
       "resource": "kuaizhizao:quality-complaint",
       "name": "质量投诉审核PQC",
-      "template": "simple",
+      "template": "complaint_pqc",
       "config_category": "quality",
       "config_section": "quality_complaint",
       "business_type": "pqc"
@@ -3992,7 +4002,7 @@
       "entity_type": "quality_complaint",
       "resource": "kuaizhizao:quality-complaint",
       "name": "质量投诉审核OQC",
-      "template": "simple",
+      "template": "complaint_oqc",
       "config_category": "quality",
       "config_section": "quality_complaint",
       "business_type": "oqc"
@@ -4002,7 +4012,7 @@
       "entity_type": "quality_complaint",
       "resource": "kuaizhizao:quality-complaint",
       "name": "质量投诉审核客户",
-      "template": "simple",
+      "template": "complaint_customer",
       "config_category": "quality",
       "config_section": "quality_complaint",
       "business_type": "customer"
