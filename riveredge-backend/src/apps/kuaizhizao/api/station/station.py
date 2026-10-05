@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 
 from core.api.deps import get_current_user, get_current_tenant
 from apps.kuaizhizao.api._kuaizhizao_route_access import require_kuaizhizao_module_access
+from apps.kuaizhizao.api.station.access import require_station_role, require_station_settings, user_has_station_role
 from infra.models.user import User
 from infra.exceptions.exceptions import BusinessLogicError, NotFoundError
 from infra.services.face_template_service import FaceTemplateService
@@ -25,6 +26,7 @@ from apps.kuaizhizao.schemas.station import (
     FaceIdentifyRequest,
     FaceIdentifyResponse,
     FaceTemplateResponse,
+    FaceEnrolledAccountResponse,
     SkillCheckRequest,
     SkillCheckResponse,
     OperatorSkillCreate,
@@ -37,7 +39,10 @@ from apps.kuaizhizao.schemas.station import (
 router = APIRouter(
     prefix="/station",
     tags=["App - Kuaige Zhizao - Station Terminal"],
-    dependencies=[Depends(require_kuaizhizao_module_access("production-execution-terminal"))],
+    dependencies=[
+        Depends(require_kuaizhizao_module_access("production-execution-terminal")),
+        Depends(require_station_role),
+    ],
 )
 
 station_service = StationService()
@@ -236,10 +241,12 @@ async def get_station_operation_documents(
 @router.post("/face-templates", response_model=FaceTemplateResponse, summary="Enroll face template")
 async def enroll_face_template(
     data: FaceEnrollRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_station_settings),
     tenant_id: int = Depends(get_current_tenant),
 ) -> FaceTemplateResponse:
     try:
+        if not await user_has_station_role(data.user_id, tenant_id):
+            raise BusinessLogicError("只能为触屏专用角色账号录入人脸")
         tpl = await FaceTemplateService.enroll(
             tenant_id=tenant_id,
             user_id=data.user_id,
@@ -252,6 +259,15 @@ async def enroll_face_template(
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
+@router.get("/face-templates", response_model=List[FaceEnrolledAccountResponse], summary="List enrolled face accounts")
+async def list_face_accounts(
+    current_user: User = Depends(require_station_settings),
+    tenant_id: int = Depends(get_current_tenant),
+) -> List[FaceEnrolledAccountResponse]:
+    rows = await FaceTemplateService.list_accounts(tenant_id)
+    return [FaceEnrolledAccountResponse.model_validate(r) for r in rows]
+
+
 @router.get("/face-templates/me", response_model=List[FaceTemplateResponse])
 async def list_my_face_templates(
     current_user: User = Depends(get_current_user),
@@ -261,10 +277,23 @@ async def list_my_face_templates(
     return [FaceTemplateResponse.model_validate(r) for r in rows]
 
 
+@router.delete("/face-templates/by-user/{user_id}", summary="Delete all face samples for a user")
+async def delete_face_templates_for_user(
+    user_id: int,
+    current_user: User = Depends(require_station_settings),
+    tenant_id: int = Depends(get_current_tenant),
+):
+    try:
+        deleted = await FaceTemplateService.delete_for_user(tenant_id, user_id)
+        return {"deleted": True, "count": deleted}
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+
+
 @router.delete("/face-templates/{template_id}", summary="Delete face template")
 async def delete_face_template(
     template_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_station_settings),
     tenant_id: int = Depends(get_current_tenant),
 ):
     try:

@@ -60,6 +60,7 @@ riveredge-backend/backups/
 .agent-teams/
 .agent-audit/
 .argo/
+.aoci/
 .cursor/
 .trae/
 .vscode/
