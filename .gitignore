@@ -62,6 +62,7 @@ riveredge-backend/backups/
 .argo/
 .aoci/
 .cursor/
+.idea/
 .trae/
 .vscode/
 # 架构/编排临时产物（应放仓库外，如 D:\kuaigeyun-pro\_out-of-repo\）
