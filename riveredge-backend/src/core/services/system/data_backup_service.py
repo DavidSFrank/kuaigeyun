@@ -70,6 +70,7 @@ class DataBackupService:
         backup_type: Optional[str] = None,
         backup_scope: Optional[str] = None,
         status: Optional[str] = None,
+        keyword: Optional[str] = None,
         *,
         is_infra_admin: bool = False,
     ) -> Tuple[List[DataBackup], int]:
@@ -88,6 +89,9 @@ class DataBackupService:
             query = query.filter(backup_scope=backup_scope)
         if status:
             query = query.filter(status=status)
+        kw = (keyword or "").strip()
+        if kw:
+            query = query.filter(name__icontains=kw)
 
         total = await query.count()
         items = await query.order_by("-created_at").offset((page - 1) * page_size).limit(page_size).all()
