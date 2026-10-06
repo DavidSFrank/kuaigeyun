@@ -1155,7 +1155,7 @@ class DatasetService:
                     endpoint=endpoint,
                     headers=query_config.get("headers"),
                 )
-            except ValidationError as exc:
+            except (ValidationError, ValueError) as exc:
                 return {
                     "success": False,
                     "data": [],
@@ -1171,6 +1171,28 @@ class DatasetService:
             params["offset"] = offset
 
             body = query_config.get("body") or {}
+            conn_type = str(getattr(integration_config, "type", "") or "").strip()
+            if conn_type in ("kingdee_cosmic", "kingdee_xinghan", "kingdee_ai_suite"):
+                from core.services.integration.kingdee_cosmic_paths import (
+                    prepare_kingdee_cosmic_outbound,
+                )
+
+                try:
+                    method, url, params, body = prepare_kingdee_cosmic_outbound(
+                        integration_config.get_config(),
+                        url,
+                        method,
+                        params,
+                        body if isinstance(body, dict) else {},
+                    )
+                except (ValidationError, ValueError) as exc:
+                    return {
+                        "success": False,
+                        "data": [],
+                        "total": None,
+                        "columns": None,
+                        "error": str(exc),
+                    }
 
             client = get_http_client()
             if method == "GET":

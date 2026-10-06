@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from core.api.deps import get_current_user, get_current_tenant
 from apps.kuaizhizao.api._kuaizhizao_route_access import require_kuaizhizao_module_access
 from apps.kuaizhizao.api.station.access import require_station_role, require_station_settings, user_has_station_role
+from core.services.authorization.user_permission_service import UserPermissionService
 from infra.models.user import User
 from infra.exceptions.exceptions import BusinessLogicError, NotFoundError
 from infra.services.face_template_service import FaceTemplateService
@@ -245,16 +246,24 @@ async def enroll_face_template(
     tenant_id: int = Depends(get_current_tenant),
 ) -> FaceTemplateResponse:
     try:
+        # Explicit authorize: admin代录 must not trust data.user_id alone
+        if not await UserPermissionService.is_admin_bypass(current_user, tenant_id):
+            raise HTTPException(status_code=403, detail="Forbidden: face enroll requires admin permission")
         if not await user_has_station_role(data.user_id, tenant_id):
             raise BusinessLogicError("只能为触屏专用角色账号录入人脸")
-        tpl = await FaceTemplateService.enroll(
+        sample_vecs = list(data.samples) if data.samples else (
+            [list(data.descriptor)] if data.descriptor else []
+        )
+        if not sample_vecs:
+            raise BusinessLogicError("缺少人脸特征向量")
+        tpls = await FaceTemplateService.enroll_many(
             tenant_id=tenant_id,
             user_id=data.user_id,
-            descriptor=data.descriptor,
+            samples=sample_vecs,
             quality=data.quality,
             device_info=data.device_info,
         )
-        return FaceTemplateResponse.model_validate(tpl)
+        return FaceTemplateResponse.model_validate(tpls[-1])
     except (BusinessLogicError, NotFoundError) as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -311,6 +320,7 @@ async def identify_face(
 ) -> FaceIdentifyResponse:
     try:
         result = await FaceTemplateService.identify(tenant_id, data.descriptor)
+        result["has_station_role"] = await user_has_station_role(int(result["user_id"]), tenant_id)
         return FaceIdentifyResponse.model_validate(result)
     except BusinessLogicError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
