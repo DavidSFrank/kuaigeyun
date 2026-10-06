@@ -3625,6 +3625,7 @@ export default {
   'app.kuaioa.employee.payMethod.piece': '计件',
   'app.kuaioa.employee.payMethod.time': '计时',
   'app.kuaioa.employee.payMethod.line': '产线',
+  'app.kuaioa.employee.payMethod.month': '月薪',
   'app.kuaioa.employee.hourlyRate': '计时单价',
   'app.kuaioa.employee.hireDate': '入职时间',
   'app.kuaioa.employee.leaveDate': '离职时间',
@@ -29870,6 +29871,18 @@ export default {
   'pages.dashboard.updateLogTab.all': '全部',
   'pages.dashboard.updateLogTab.dedicated': '定制',
   'pages.dashboard.updateLog.badge.dedicated': '定制',
+  'pages.dashboard.updateLog.entries.oa-hire-form-pay-month-r01.title':
+    '入职登记字段与员工档案对齐并支持月薪',
+  'pages.dashboard.updateLog.entries.oa-hire-form-pay-month-r01.description':
+    '入职登记、临时工登记补齐产线、银行卡、生活费、岗位工资、社保公积金、房租电费与节日福利等档案字段；计薪方式新增月薪，结算时按岗位工资计发、不再按计时单价折算。',
+  'pages.dashboard.updateLog.entries.workshop-create-unique-pkey-r01.title':
+    '车间新建不再误报编码已存在',
+  'pages.dashboard.updateLog.entries.workshop-create-unique-pkey-r01.description':
+    '新建车间按精确编码判重，并校准主键序列；主键冲突不再被说成编码已存在，未占用的编码可以正常保存。',
+  'pages.dashboard.updateLog.entries.login-log-ip-location-sticky-r01.title':
+    '登录日志同一 IP 地点不再中英混跳',
+  'pages.dashboard.updateLog.entries.login-log-ip-location-sticky-r01.description':
+    '新 IP 首次登录多源按省→市投票定坐标，再逆地理写成中文地址落库；同一 IP 第二次及以后直接复用首次结果，不再重投。',
   'pages.dashboard.updateLog.entries.im-module-notify-dedupe-r01.title':
     '模块群工序交接通知不再重复两条',
   'pages.dashboard.updateLog.entries.im-module-notify-dedupe-r01.description':

@@ -21,7 +21,7 @@ from core.utils.timezone_utils import resolve_business_datetime
 from infra.exceptions.exceptions import BusinessLogicError, NotFoundError
 
 _ALLOWED_EMPLOYMENT = frozenset({"formal", "temp", "labor"})
-_ALLOWED_PAY = frozenset({"piece", "time", "line"})
+_ALLOWED_PAY = frozenset({"piece", "time", "line", "month"})
 _ALLOWED_STATUS = frozenset({"active", "left"})
 
 
