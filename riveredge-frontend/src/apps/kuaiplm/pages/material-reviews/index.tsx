@@ -3,7 +3,7 @@
  * 菜单待 DoD 后挂入；路由 /apps/kuaiplm/material-reviews
  */
 
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -15,6 +15,7 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import {
+  Alert,
   App,
   Button,
   Col,
@@ -27,6 +28,7 @@ import {
   Select,
   Space,
   Table,
+  Upload,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { UniTable } from '../../../../components/uni-table';
@@ -41,6 +43,7 @@ import {
 } from '../../../../components/layout-templates';
 import { detailDrawerDescriptionItems } from '../../../../components/layout-templates/detailDrawerDescriptionItems';
 import { useResourcePermissions } from '../../../../hooks/useResourcePermissions';
+import { useAuditRequired } from '../../../../hooks/useAuditRequired';
 import { getApiErrorMessage } from '../../../../utils/errorHandler';
 import { todaySiteDateString } from '../../../../utils/format';
 import { downloadRecordsAsXlsx, type ExportXlsxColumn } from '../../../../utils/exportRecordsXlsx';
