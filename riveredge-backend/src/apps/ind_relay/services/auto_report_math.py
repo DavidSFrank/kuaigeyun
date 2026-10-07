@@ -39,10 +39,12 @@ def allocate_increment(
     increment: Decimal,
     remainings: Sequence[Decimal],
     *,
-    last_takes_overflow: bool = True,
+    last_takes_overflow: bool = False,
 ) -> list[Decimal]:
     """
-    按任务顺序分摊增量：前面填到 remaining，末张可吃尾量（允许超计划）。
+    按任务顺序分摊增量：每张最多填到 remaining。
+    last_takes_overflow=False（默认）：超出全部可报量的部分不分配，留给 pending。
+    last_takes_overflow=True：末张可吃尾量（继电器自动报工勿用，避免超报被正式报工拒绝）。
     返回与 remainings 等长的本次分配量。
     """
     qty = increment if increment > ZERO else ZERO
@@ -74,6 +76,19 @@ def planned_start_ts(value: Optional[datetime]) -> float:
         return float(value.timestamp())
     except (OSError, OverflowError, TypeError, ValueError):
         return 0.0
+
+
+def equipment_in_default_ids(raw: object, equipment_id: int) -> bool:
+    """工序主数据 default_equipment_ids 是否包含该 MES 设备。"""
+    if raw is None or not isinstance(raw, (list, tuple)):
+        return False
+    for item in raw:
+        try:
+            if int(item) == int(equipment_id):
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
 
 
 def candidate_bind_sort_key(
