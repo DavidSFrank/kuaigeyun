@@ -1979,7 +1979,7 @@ function Start-BackendDev {
         $env:HOST = '0.0.0.0'
         $env:PORT = "$($script:BACKEND_PORT)"
         $args = @('run','--extra','pdf','python','scripts/run_dev_server.py')
-        $pid = Start-ProcessBackground 'backend' $uv $args @{ PYTHONPATH = $env:PYTHONPATH; SETUPTOOLS_EGG_INFO_DIR = $script:LogsDir; HOST = $env:HOST; PORT = $env:PORT; WORKDIR = $script:BackendDir }
+        $backendProcId = Start-ProcessBackground 'backend' $uv $args @{ PYTHONPATH = $env:PYTHONPATH; SETUPTOOLS_EGG_INFO_DIR = $script:LogsDir; HOST = $env:HOST; PORT = $env:PORT; WORKDIR = $script:BackendDir }
     } finally { Pop-Location }
     $retries = 0
     while ($retries -lt $script:BackendStartTimeout) {
@@ -2018,7 +2018,8 @@ function Start-FrontendDev {
     try {
         $env:VITE_BACKEND_HOST = if ($env:VITE_BACKEND_HOST) { $env:VITE_BACKEND_HOST } else { '127.0.0.1' }
         $env:VITE_BACKEND_PORT = if ($env:VITE_BACKEND_PORT) { $env:VITE_BACKEND_PORT } else { "$($script:BACKEND_PORT)" }
-        Start-ProcessBackground 'frontend' 'npx' @('vite',"--port",$script:FRONTEND_PORT,'--host','0.0.0.0') @{
+        # Windows: bare 'npx' resolves to the bash shim (no extension), which Start-Process cannot run.
+        Start-ProcessBackground 'frontend' 'npx.cmd' @('vite',"--port",$script:FRONTEND_PORT,'--host','0.0.0.0') @{
             WORKDIR = $script:FrontendDir
             VITE_BACKEND_HOST = $env:VITE_BACKEND_HOST
             VITE_BACKEND_PORT = $env:VITE_BACKEND_PORT
@@ -2037,8 +2038,8 @@ function Start-BackendProd {
     }
     $pidf = Join-Path $script:LogsDir 'backend.pid'
     if (-not $script:ForceBackendRestart -and (Test-Path $pidf)) {
-        $pid = [int](Get-Content $pidf -Raw).Trim()
-        if (Get-Process -Id $pid -ErrorAction SilentlyContinue) { Write-LogInfo '后端已在运行'; return }
+        $procId = [int](Get-Content $pidf -Raw).Trim()
+        if (Get-Process -Id $procId -ErrorAction SilentlyContinue) { Write-LogInfo '后端已在运行'; return }
     }
     if ($script:ForceBackendRestart -and (Test-Path $pidf)) {
         Write-LogInfo '时区已校正，强制重启后端...'
@@ -2138,8 +2139,8 @@ function Wait-ForCaddyListening {
         }
         $pidf = Join-Path $script:LogsDir 'caddy.pid'
         if (Test-Path $pidf) {
-            $pid = [int](Get-Content $pidf -Raw).Trim()
-            if (-not (Get-Process -Id $pid -ErrorAction SilentlyContinue)) { return $false }
+            $procId = [int](Get-Content $pidf -Raw).Trim()
+            if (-not (Get-Process -Id $procId -ErrorAction SilentlyContinue)) { return $false }
         }
         Start-Sleep -Seconds 1
     }
@@ -2297,9 +2298,9 @@ function Invoke-Status {
     foreach ($name in @('backend','frontend','worker','scheduler','caddy')) {
         $pidf = Join-Path $script:LogsDir "$name.pid"
         if (Test-Path $pidf) {
-            $pid = (Get-Content $pidf -Raw).Trim()
-            if (Get-Process -Id ([int]$pid) -ErrorAction SilentlyContinue) {
-                Write-Host "  ${name}: 运行中 (PID $pid)"
+            $procId = (Get-Content $pidf -Raw).Trim()
+            if (Get-Process -Id ([int]$procId) -ErrorAction SilentlyContinue) {
+                Write-Host "  ${name}: 运行中 (PID $procId)"
             } else { Write-Host "  ${name}: 未运行" }
         } else { Write-Host "  ${name}: 未运行" }
     }
@@ -2582,8 +2583,8 @@ function Test-RiverEdgeBootActive {
     Ensure-LogsDir
     $pidf = Join-Path $script:LogsDir 'backend.pid'
     if (-not (Test-Path $pidf)) { return $false }
-    $pid = [int](Get-Content $pidf -Raw).Trim()
-    return [bool](Get-Process -Id $pid -ErrorAction SilentlyContinue)
+    $procId = [int](Get-Content $pidf -Raw).Trim()
+    return [bool](Get-Process -Id $procId -ErrorAction SilentlyContinue)
 }
 
 function Get-RiverEdgeBootStatusLabel {
