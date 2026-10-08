@@ -4,6 +4,11 @@
 #   ./fast-deploy/launch.dev.sh              # 后端 + Worker + PC 前端
 #   ./fast-deploy/launch.dev.sh with-h5      # 同上，并启动手机 Expo Web（别名: withh5 / with5）
 #   ./fast-deploy/launch.dev.sh stop|status|be|fe|me
+#
+# Windows PowerShell / Cursor 终端：不要直接 .\launch.dev.sh（会交给 git-bash.exe 另开窗口，看起来无输出）
+#   请用: .\fast-deploy\launch.dev.ps1 withh5
+# 或在 Git Bash 内: ./fast-deploy/launch.dev.sh withh5
+# 手机 H5 默认端口 8098（8081 常落在 Hyper-V 保留段）→ http://127.0.0.1:8098/
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
