@@ -2786,10 +2786,210 @@ resolve_playwright_browsers_path() {
     echo "${PLAYWRIGHT_BROWSERS_PATH:-$PROJECT_ROOT/.playwright-browsers}"
 }
 
+_playwright_arch_suffix() {
+    case "$(uname -m)" in
+        aarch64|arm64) echo "-arm64" ;;
+        *) echo "-x64" ;;
+    esac
+}
+
+_playwright_version_ge() {
+    # $1=已装版本如 1.63.0；$2=下限如 1.61.0 → 0=已达下限
+    local cur="${1:-0}" need="${2:-0}"
+    printf '%s\n%s\n' "$need" "$cur" | sort -V | head -1 | grep -qx "$need"
+}
+
+_playwright_installed_version() {
+    # 尽量读已装 Playwright；失败返回空（由调用方按保守策略处理）
+    local uv_bin ver
+    uv_bin="$(resolve_uv 2>/dev/null)" || return 0
+    [ -n "$uv_bin" ] || return 0
+    [ -d "$BACKEND_DIR" ] || return 0
+    ver="$(
+        cd "$BACKEND_DIR" 2>/dev/null && \
+        "$uv_bin" run --no-sync python -m playwright --version 2>/dev/null | \
+            awk '{print $2; exit}'
+    )" || true
+    if [ -z "$ver" ]; then
+        ver="$(
+            cd "$BACKEND_DIR" 2>/dev/null && \
+            "$uv_bin" run --extra pdf python -m playwright --version 2>/dev/null | \
+                awk '{print $2; exit}'
+        )" || true
+    fi
+    printf '%s' "$ver"
+}
+
+_playwright_os_id_version() {
+    # 输出: "<id> <version_id>"，不污染当前 shell
+    [ -f /etc/os-release ] || { echo "linux "; return 0; }
+    # shellcheck disable=SC1091
+    (
+        set -a
+        # shellcheck disable=SC1091
+        . /etc/os-release
+        set +a
+        printf '%s %s' "$(printf '%s' "${ID:-linux}" | tr '[:upper:]' '[:lower:]')" "${VERSION_ID:-}"
+    )
+}
+
+_playwright_auto_platform_override() {
+    # 按 /etc/os-release + Playwright 版本选择 install/install-deps 用的宿主平台。
+    # 空字符串 = 不覆盖，交给 Playwright 原生探测。
+    # deploy.env 已设 PLAYWRIGHT_HOST_PLATFORM_OVERRIDE 时本函数不会被用来覆盖。
+    [ "$(uname -s)" = "Linux" ] || { echo ""; return 0; }
+
+    local id ver major minor arch pw_ver os_line
+    os_line="$(_playwright_os_id_version)"
+    id="${os_line%% *}"
+    ver="${os_line#* }"
+    major="${ver%%.*}"
+    minor="${ver#*.}"
+    minor="${minor%%.*}"
+    case "$major" in ''|*[!0-9]*) major=0 ;; esac
+    case "$minor" in ''|*[!0-9]*) minor=0 ;; esac
+    arch="$(_playwright_arch_suffix)"
+    pw_ver="$(_playwright_installed_version)"
+
+    case "$id" in
+        ubuntu|linuxmint|pop|elementary|zorin)
+            # Playwright 官方 Ubuntu 宿主：22.04 / 24.04；1.61+ 增加 26.04
+            if [ "$major" -ge 28 ]; then
+                # 尚未收录的更新发行版：优先用已支持的最新 LTS 构建
+                if [ -n "$pw_ver" ] && _playwright_version_ge "$pw_ver" "1.61.0"; then
+                    echo "ubuntu26.04${arch}"
+                else
+                    echo "ubuntu24.04${arch}"
+                fi
+                return 0
+            fi
+            if [ "$major" -ge 26 ]; then
+                if [ -n "$pw_ver" ] && _playwright_version_ge "$pw_ver" "1.61.0"; then
+                    echo ""  # 1.61+ 原生 ubuntu26.04
+                else
+                    echo "ubuntu24.04${arch}"
+                fi
+                return 0
+            fi
+            if [ "$major" -ge 22 ]; then
+                echo ""
+                return 0
+            fi
+            # 更老 Ubuntu：钉到 22.04 构建
+            echo "ubuntu22.04${arch}"
+            return 0
+            ;;
+        debian)
+            # Playwright 对 Debian 有独立表；未知新版本回退到相近 Ubuntu 构建
+            if [ "$major" -ge 14 ]; then
+                if [ -n "$pw_ver" ] && _playwright_version_ge "$pw_ver" "1.61.0"; then
+                    echo "ubuntu26.04${arch}"
+                else
+                    echo "ubuntu24.04${arch}"
+                fi
+                return 0
+            fi
+            echo ""
+            return 0
+            ;;
+        *)
+            echo ""
+            return 0
+            ;;
+    esac
+}
+
+playwright_apply_host_platform() {
+    # 安装 Chromium / install-deps 前调用：按系统版本选对 Playwright 依赖平台
+    # deploy.env 显式设置的 OVERRIDE 优先；自动探测结果可在 uv sync 后随 Playwright 版本重算
+    local auto reason_os reason_pw
+    if [ -n "${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE:-}" ] && [ "${PLAYWRIGHT_HOST_PLATFORM_AUTO:-0}" != "1" ]; then
+        export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE
+        return 0
+    fi
+    [ "$(uname -s)" = "Linux" ] || return 0
+
+    auto="$(_playwright_auto_platform_override)"
+    if [ -z "$auto" ]; then
+        unset PLAYWRIGHT_HOST_PLATFORM_OVERRIDE 2>/dev/null || true
+        unset PLAYWRIGHT_HOST_PLATFORM_AUTO 2>/dev/null || true
+        return 0
+    fi
+
+    export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE="$auto"
+    export PLAYWRIGHT_HOST_PLATFORM_AUTO=1
+    reason_os="$(_playwright_os_id_version)"
+    reason_pw="$(_playwright_installed_version)"
+    if [ "${PLAYWRIGHT_PLATFORM_LOGGED:-0}" != "1" ] || [ "${PLAYWRIGHT_PLATFORM_LOGGED_VALUE:-}" != "$auto" ]; then
+        log_special "Playwright 宿主平台: ${reason_os} → PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=${auto}（Playwright ${reason_pw:-未知}）"
+        PLAYWRIGHT_PLATFORM_LOGGED=1
+        PLAYWRIGHT_PLATFORM_LOGGED_VALUE="$auto"
+    fi
+}
+
 playwright_export_env() {
     # 无论是否后台补装，运行时都要指向同一浏览器目录（低配关闭补装≠删除已装 Chromium）
     export PLAYWRIGHT_BROWSERS_PATH="$(resolve_playwright_browsers_path)"
     mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+    playwright_apply_host_platform
+}
+
+_playwright_fallback_platform_override() {
+    case "$(uname -m)" in
+        aarch64|arm64) echo "ubuntu24.04-arm64" ;;
+        *) echo "ubuntu24.04-x64" ;;
+    esac
+}
+
+_playwright_install_chromium_browser() {
+    local uv_bin="$1"
+    local override
+    playwright_export_env
+    if (cd "$BACKEND_DIR" && "$uv_bin" run --extra pdf python -m playwright install chromium); then
+        return 0
+    fi
+    if [ "$(uname -s)" != "Linux" ]; then
+        return 1
+    fi
+    # 自动探测仍失败时，再钉到 24.04 构建重试一次
+    override="$(_playwright_fallback_platform_override)"
+    if [ "${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE:-}" = "$override" ]; then
+        return 1
+    fi
+    log_warn "Playwright install chromium 失败，改用 PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=${override}"
+    (cd "$BACKEND_DIR" && \
+        PLAYWRIGHT_HOST_PLATFORM_OVERRIDE="$override" \
+        "$uv_bin" run --extra pdf python -m playwright install chromium)
+}
+
+_playwright_install_system_deps() {
+    # Linux：为 chrome-headless-shell 安装系统 .so（需 sudo）；无权限时只打印指引
+    local uv_bin="$1"
+    local override
+    [ "$(uname -s)" = "Linux" ] || return 0
+    playwright_export_env
+    if ! _sudo_can_run; then
+        log_warn "无免密 sudo，无法自动安装 Chromium 系统库"
+        log_warn "请手动执行: cd ${BACKEND_DIR} && sudo env PLAYWRIGHT_BROWSERS_PATH=${PLAYWRIGHT_BROWSERS_PATH} ${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE:+PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=$PLAYWRIGHT_HOST_PLATFORM_OVERRIDE} $(resolve_uv) run --extra pdf python -m playwright install-deps chromium"
+        return 1
+    fi
+    log_info "安装 Chromium 系统依赖（playwright install-deps${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE:+，平台 $PLAYWRIGHT_HOST_PLATFORM_OVERRIDE}）..."
+    if (cd "$BACKEND_DIR" && "$uv_bin" run --extra pdf python -m playwright install-deps chromium); then
+        log_ok "Chromium 系统依赖已安装"
+        return 0
+    fi
+    override="$(_playwright_fallback_platform_override)"
+    if [ "${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE:-}" != "$override" ]; then
+        log_warn "install-deps 失败，改用 PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=${override}"
+        if (cd "$BACKEND_DIR" && \
+            PLAYWRIGHT_HOST_PLATFORM_OVERRIDE="$override" \
+            "$uv_bin" run --extra pdf python -m playwright install-deps chromium); then
+            log_ok "Chromium 系统依赖已安装（平台回退 ${override}）"
+            return 0
+        fi
+    fi
+    log_warn "playwright install-deps 未完全成功，详见上方日志"
+    return 1
 }
 
 playwright_uv_extra_args() {
@@ -2826,31 +3026,6 @@ with sync_playwright() as p:
 sys.exit(0)
 PY
     )
-}
-
-_playwright_install_system_deps() {
-    # Linux：为 chrome-headless-shell 安装系统 .so（需 sudo）；无权限时只打印指引
-    local uv_bin="$1"
-    [ "$(uname -s)" = "Linux" ] || return 0
-    playwright_export_env
-    if ! _sudo_can_run; then
-        log_warn "无免密 sudo，无法自动安装 Chromium 系统库"
-        log_warn "请手动执行: cd ${BACKEND_DIR} && sudo $(resolve_uv) run --extra pdf python -m playwright install-deps chromium"
-        return 1
-    fi
-    log_info "安装 Chromium 系统依赖（playwright install-deps）..."
-    if (cd "$BACKEND_DIR" && "$uv_bin" run --extra pdf python -m playwright install-deps chromium); then
-        log_ok "Chromium 系统依赖已安装"
-        return 0
-    fi
-    log_warn "playwright install-deps 未完全成功，详见上方日志"
-    return 1
-}
-
-_playwright_install_chromium_browser() {
-    local uv_bin="$1"
-    playwright_export_env
-    (cd "$BACKEND_DIR" && "$uv_bin" run --extra pdf python -m playwright install chromium)
 }
 
 playwright_current_version() {
@@ -3395,11 +3570,11 @@ ensure_playwright_chromium_sync() {
         fi
         if [ "$(uname -s)" = "Linux" ]; then
             echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] start: playwright install-deps chromium" >>"$logf"
-            "$uv_bin" run --extra pdf python -m playwright install-deps chromium >>"$logf" 2>&1 || \
+            _playwright_install_system_deps "$uv_bin" >>"$logf" 2>&1 || \
                 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] warn: install-deps 失败（可能缺 sudo）" >>"$logf"
         fi
         echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] start: playwright install chromium (sync)" >>"$logf"
-        if "$uv_bin" run --extra pdf python -m playwright install chromium >>"$logf" 2>&1; then
+        if _playwright_install_chromium_browser "$uv_bin" >>"$logf" 2>&1; then
             playwright_write_chromium_marker
             echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ok: Playwright Chromium 安装完成" >>"$logf"
         else
@@ -3485,11 +3660,11 @@ ensure_playwright_chromium_postinstall() {
         fi
         if [ "$(uname -s)" = "Linux" ]; then
             echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] start: playwright install-deps chromium"
-            "$uv_bin" run --extra pdf python -m playwright install-deps chromium || \
+            _playwright_install_system_deps "$uv_bin" || \
                 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] warn: install-deps 失败（可能缺 sudo）"
         fi
         echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] start: playwright install chromium"
-        if "$uv_bin" run --extra pdf python -m playwright install chromium; then
+        if _playwright_install_chromium_browser "$uv_bin"; then
             playwright_write_chromium_marker
             echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ok: Playwright Chromium 补装完成"
         else

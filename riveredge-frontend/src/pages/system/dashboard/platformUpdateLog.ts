@@ -137,6 +137,22 @@ export const PLATFORM_UPDATE_LOG_GENERAL: PlatformUpdateLogEntry[] = [
       'pages.dashboard.updateLog.entries.customer-follow-up-create-data-scope-r02.description',
   },
   {
+    id: 'pc-audit-unreview-empty-pending-r01',
+    date: '2026-10-09',
+    type: 'fix',
+    titleKey: 'pages.dashboard.updateLog.entries.pc-audit-unreview-empty-pending-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.pc-audit-unreview-empty-pending-r01.description',
+  },
+  {
+    id: 'traceability-sankey-stack-overflow-r01',
+    date: '2026-10-09',
+    type: 'fix',
+    titleKey: 'pages.dashboard.updateLog.entries.traceability-sankey-stack-overflow-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.traceability-sankey-stack-overflow-r01.description',
+  },
+  {
     id: 'customer-follow-up-create-data-scope-r01',
     date: '2026-10-08',
     type: 'fix',

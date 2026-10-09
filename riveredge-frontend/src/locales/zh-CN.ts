@@ -30196,6 +30196,14 @@ export default {
     '客户跟进支持未归属客户',
   'pages.dashboard.updateLog.entries.customer-follow-up-create-data-scope-r02.description':
     '新建跟进可选择本人负责、协作或未归属（公海）客户，下拉与保存同一范围；他人已归属客户不可跟进，不再误报笼统权限不足。',
+  'pages.dashboard.updateLog.entries.pc-audit-unreview-empty-pending-r01.title':
+    '审核反审核不再出现空壳待审与审计静默',
+  'pages.dashboard.updateLog.entries.pc-audit-unreview-empty-pending-r01.description':
+    '采购订单/工艺路线变更提交时审批流程缺失不再落永久待审；审批完成回调失败会留痕可补齐；反审核对已结束实例记 revoke_noop；审批中心实例列表仅当前审批人可见同意/拒绝/转交。',
+  'pages.dashboard.updateLog.entries.traceability-sankey-stack-overflow-r01.title':
+    '追溯管理导出/看图不再拖垮快制造',
+  'pages.dashboard.updateLog.entries.traceability-sankey-stack-overflow-r01.description':
+    '双向追溯节点链过长或成环时，桑基/流程图去环改为迭代算法并隔离图表错误，避免 Maximum call stack size exceeded 导致整个快制造应用加载失败；导出报告失败信息也会截断展示。',
   'pages.dashboard.updateLog.entries.customer-follow-up-create-data-scope-r01.title':
     '客户跟进新建不再误报权限不足',
   'pages.dashboard.updateLog.entries.customer-follow-up-create-data-scope-r01.description':
