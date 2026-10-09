@@ -166,7 +166,8 @@ export const OaDepartmentSelect: React.FC<{
   hostResource?: string;
   /** 额外选项（如员工档案部门名），与部门树合并去重 */
   extraOptions?: Array<{ label: string; value: string }>;
-}> = ({ name, label, rules, colProps, disabled, hostResource, extraOptions }) => {
+  mode?: 'multiple';
+}> = ({ name, label, rules, colProps, disabled, hostResource, extraOptions, mode }) => {
   const { t } = useTranslation();
   const { message } = App.useApp();
   const [treeOptions, setTreeOptions] = useState<Array<{ label: string; value: string }>>([]);
@@ -224,6 +225,7 @@ export const OaDepartmentSelect: React.FC<{
       colProps={colProps}
       disabled={disabled}
       showSearch
+      mode={mode}
       options={options}
       fieldProps={{ optionFilterProp: 'label', disabled }}
     />
