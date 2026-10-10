@@ -44,6 +44,14 @@ export const PLATFORM_UPDATE_TYPE_ORDER: PlatformUpdateType[] = [
  */
 export const PLATFORM_UPDATE_LOG_GENERAL: PlatformUpdateLogEntry[] = [
   {
+    id: 'gitee-oauth-drop-projects-scope-r01',
+    date: '2026-10-11',
+    type: 'fix',
+    titleKey: 'pages.dashboard.updateLog.entries.gitee-oauth-drop-projects-scope-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.gitee-oauth-drop-projects-scope-r01.description',
+  },
+  {
     id: 'gitee-oauth-first-or-bind-r01',
     date: '2026-10-10',
     type: 'improvement',
