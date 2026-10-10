@@ -29425,7 +29425,7 @@ export default {
   'pages.system.apis.bodyValuePlaceholder': '值（支持字符串、数字、JSON）',
   'pages.system.apis.sourceTypeConversionLabel': '来源类型编码转换',
   'pages.system.apis.sourceTypeConversionHint':
-    '如金蝶 FErpClsID：1=Buy 外购件，2=Make 自制件（物料同步时按接口配置转换）；也可用于推送单位编码（field_name 如 unit_number）',
+    '如金蝶 FErpClsID：1=Buy 外购件，2=Make 自制件。须同时满足：①请求体 FieldKeys 含该来源字段；②物料同步字段映射把它映到 source_type。也可用于推送单位编码（field_name 如 unit_number）',
   'pages.system.apis.sourceCodeHint': '多个值用逗号分隔，如：1,2,3',
   'pages.system.apis.targetTypeHint': '多个值用逗号分隔，如：Buy,Make,Outsource',
   'pages.system.apis.sourceFieldLabel': '来源字段名',
@@ -30231,6 +30231,10 @@ export default {
     '登录地点广州等城市不再截成单字',
   'pages.dashboard.updateLog.entries.login-log-location-zhou-suffix-r01.description':
     'IP 解析去行政区后缀时误把「州」当成尾缀，导致「广州」显示成「广」。现已保留两字市名，并优先识别「自治州」等完整后缀。',
+  'pages.dashboard.updateLog.entries.material-sync-ferpclsid-source-type-r01.title':
+    '物料同步来源类型转换需拉取 FErpClsID',
+  'pages.dashboard.updateLog.entries.material-sync-ferpclsid-source-type-r01.description':
+    '金蝶物料查询预置 FieldKeys 补上物料属性 FErpClsID；接口里配置的来源类型编码转换（如 1→Buy、2→Make）在同步时才能真正生效。',
   'pages.dashboard.updateLog.entries.reporting-block-revoke-after-sales-outbound-r01.title':
     '下推单据须先反审再删，禁止跳级冲销上游',
   'pages.dashboard.updateLog.entries.reporting-block-revoke-after-sales-outbound-r01.description':
