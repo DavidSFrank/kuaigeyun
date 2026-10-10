@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-10-07T06:04:21Z",
-  "updated_at": "2026-10-10T05:20:28Z",
+  "updated_at": "2026-10-10T05:33:37Z",
   "files": {
     ".cursor/rules/aoci-git-commit.mdc": {
       "role": "index",
@@ -47,9 +47,9 @@
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "577b1b6e63c125337715a1901dc5bef3272a8a17afd6a4e1c41f729a27b299a5",
-      "size": 993601,
-      "normalized_sha256": "577b1b6e63c125337715a1901dc5bef3272a8a17afd6a4e1c41f729a27b299a5"
+      "sha256": "919336f5eb5b87a317e8708b8ab85ab19d6c560f3561609c776535222ed59081",
+      "size": 993805,
+      "normalized_sha256": "919336f5eb5b87a317e8708b8ab85ab19d6c560f3561609c776535222ed59081"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -263,9 +263,9 @@
     },
     "fast-deploy/config/deploy.env.example": {
       "role": "index",
-      "sha256": "1d856d1f8763175a6acf03ef613617dcadf0df7d92a75a9f74d2957193f67493",
-      "size": 6735,
-      "normalized_sha256": "1d856d1f8763175a6acf03ef613617dcadf0df7d92a75a9f74d2957193f67493"
+      "sha256": "3fd428b6779174d36f3e6067544b867d75ddd8c97c3fcd2f3540391002c7663a",
+      "size": 6848,
+      "normalized_sha256": "3fd428b6779174d36f3e6067544b867d75ddd8c97c3fcd2f3540391002c7663a"
     },
     "fast-deploy/config/install-scripts.json": {
       "role": "index",
@@ -317,15 +317,15 @@
     },
     "fast-deploy/lib/common.sh": {
       "role": "index",
-      "sha256": "852297ddbb2509d09b3a4eadf9c73b8e462bc0824c07fc394d9e2628a0ad3099",
-      "size": 278634,
-      "normalized_sha256": "852297ddbb2509d09b3a4eadf9c73b8e462bc0824c07fc394d9e2628a0ad3099"
+      "sha256": "bb92f665471a4aec5f0fb4c32bab2d7c9a19acfec7d1ad2c3cf1be4d607f0cb4",
+      "size": 278550,
+      "normalized_sha256": "bb92f665471a4aec5f0fb4c32bab2d7c9a19acfec7d1ad2c3cf1be4d607f0cb4"
     },
     "fast-deploy/lib/low_spec_mode.sh": {
       "role": "index",
-      "sha256": "87b7e1402ca36eb9e64d5c9df6ca62127c87cd56c9945891ef916e515f1110ab",
-      "size": 16104,
-      "normalized_sha256": "cd79713d9e9e5a57cb832f04c6a3c96df3305ac30503b72d403b248d096ae51e"
+      "sha256": "7ed92f0738d00a0fa07d398686c95a57788223fdac564fdb05dc4855526de1a3",
+      "size": 15880,
+      "normalized_sha256": "b1b9ec561f4e7bb0ddb4abd3e2a76393d63f7c8bd69e6603c0bb3450f3f1548c"
     },
     "fast-deploy/lib/wizard.sh": {
       "role": "index",
