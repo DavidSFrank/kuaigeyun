@@ -2341,7 +2341,7 @@ repair_order_service.py[SB5L]: F:维修单服务 | R:- | A:RepairOrderService | 
 replenishment_suggestion_service.py[SB5L]: F:补货建议业务服务模块  提供补货建议相关的业务逻辑处理，包括生成补货建议、处理补货建议、下推采购等。  Author: Auto (AI Assistan... | R:- | A:_to_decimal,_apply_purchase_lot_rules,_priority_from_stock,ReplenishmentSugge... | S:1020L
 report_enhancements.py[SB5L]: F:快制造报表增强逻辑（对账、流水、毛利、委外等）。  从 report_service 抽离，避免单文件持续膨胀。 | R:- | A:_is_legacy_inbound_revoke_mislabeled,resolve_inventory_movement_report_quanti... | S:1854L
 report_service.py[SB5L]: F:报表服务模块  提供各类报表分析功能，包括库存报表、生产报表、质量报表等。  Author: Luigi Lu Date: 2025-01-15 | R:- | A:_resolve_production_report_order_by,ReportService | S:5494L
-reporting_service.py[SB5L]: F:报工业务服务模块  提供报工记录相关的业务逻辑处理，包括报工、审核等。  Author: Luigi Lu Date: 2025-01-01 | R:- | A:_sync_operation_assigned_producer_from_reporting,_resolve_work_order_operatio... | S:3820L
+reporting_service.py[DB8L]: F:报工服务：审核反审删除与出入库下游门禁 | R:code:riveredge-backend/src/apps/kuaizhizao/services/document_action_policy/reporting_record.py | A:ReportingService,revoke_reporting_approval,delete_reporting_record,batch_reporting_have_approved_inbound_downstream | S:反审删除前校验已出库与已审已入库关联；已入库禁级联冲销须原路先处理入库；待入库可跳过
 reporting_sync_service.py[SB5M]: F:报工同步服务。 | R:- | A:normalize_reporting_binding_sync_direction,ReportingSyncService | S:351L; 报工同步服务。
 reset_data_service.py[SB5M]: F:Implements reset_data_service.py | R:- | A:ResetDataService | S:290L
 rework_order_service.py[SB5L]: F:返工单业务服务模块  提供返工单相关的业务逻辑处理，包括CRUD操作、从工单创建返工单等。  Author: Luigi Lu Date: 2026-01-05 | R:- | A:rework_audit_node_key,_dec,ReworkOrderService | S:2120L
@@ -2352,10 +2352,10 @@ sales_contract_service.py[SB5L]: F:销售合同服务 | R:- | A:SalesContractSer
 sales_contract_term_service.py[SB5M]: F:销售合同条款服务 | R:- | A:SalesContractTermService | S:320L; 销售合同条款服务
 sales_opportunity_service.py[SB5L]: F:销售商机服务 | R:- | A:_status_for_stage,SalesOpportunityService | S:434L; 销售商机服务
 sales_order_change_service.py[SB5L]: F:销售变更单服务 | R:- | A:SalesOrderChangeService | S:1012L; 销售变更单服务
-sales_order_code_sync.py[SB5M]: F:销售订单编号：下游检测与改号后快照同步。 | R:- | A:_is_sales_order_draft,_lazy_work_order_model,_lazy_sales_delivery_model,_lazy... | S:373L; 销售订单编号：下游检测与改号后快照同步。
+sales_order_code_sync.py[SB6M]: F:销售订单下游检测与改号快照同步 | R:code:riveredge-backend/src/apps/kuaizhizao/models/document_relation.py | A:list_sales_order_active_downstream_documents,sales_order_downstream_by_ids,format_sales_order_downstream_labels | S:FK无采购字段时须DocumentRelation补采购订单申请；demand节点不计入删除拦截但子树继续下钻
 sales_order_ocr_service.py[SB5T]: F:销售订单 OCR 智能录单  DeepSeek 官方对话 API 仅支持文本，不支持 image_url。 流程：OCR 视觉端点提取单据文本 → Dee... | R:- | A:SalesOrderOcrService | S:69L
 sales_order_purchase_push.py[SB5L]: F:销售订单直推采购申请 / 采购订单（按单外购捷径）。  数量按销售明细订单量减已下推占用，不做库存净需求；占用仅计 source_type=sales_o... | R:- | A:_is_sales_order_source,require_purchase_requisition_for_tenant,batch_pushed_p... | S:617L
-sales_order_service.py[SB5L]: F:销售订单管理服务模块  提供销售订单相关的业务逻辑处理。 销售订单数据存储于 SalesOrder/SalesOrderItem 表，下推需求计算时生成 ... | R:- | A:SalesOrderService | S:7074L
+sales_order_service.py[DB8L]: F:销售订单服务：CRUD下推与反审删除下游门禁 | R:code:riveredge-backend/src/apps/kuaizhizao/services/sales_order_code_sync.py,code:riveredge-backend/src/apps/kuaizhizao/services/demand_service.py | A:SalesOrderService,_assert_sales_order_capability_for_order,revoke_sales_order_approval,delete_sales_order | S:delete/revoke有下游时列单号并要求先反审删下游；撤审时撤回需求计算沿用未执行级联删逻辑
 sales_order_sync_service.py[SB5L]: F:销售订单从数据接口/数据集同步服务。 | R:- | A:SalesOrderSyncService | S:934L; 销售订单从数据接口/数据集同步服务。
 sales_order_terms_service.py[SB5S]: F:销售订单条款与收款里程碑（与框架合同共用条款目录）。 | R:- | A:SalesOrderTermsService | S:192L; 销售订单条款与收款里程碑（与框架合同共用条款目录）。
 sales_review_service.py[SB5L]: F:订单评审服务：CRUD、下达/撤回、部门意见、驳回、下推销售订单。 | R:- | A:_audit_update_kwargs,SalesReviewService | S:1015L; 订单评审服务：CRUD、下达/撤回、部门意见、驳回、下推销售订单。
@@ -2390,7 +2390,7 @@ tool_status_service.py[SB5T]: F:工装状态解析服务：根据在途业务单
 visual_scheduling_service.py[SB5L]: F:可视排产服务：冲突检测、资源负荷、拖拽校验（只读，不写回计划）。 | R:- | A:_parse_dt,_intervals_overlap,_schedule_minute,_operation_start_before_prev_st... | S:1892L; 可视排产服务：冲突检测、资源负荷、拖拽校验（只读，不写回计划）。
 warehouse_dashboard_service.py[SB5L]: F:仓储看板汇总：库存统计、库存金额、待办、最近入出库。  数量口径与即时库存（inventory_helper）一致：主仓合格批次 + 线边仓； 金额单价与... | R:- | A:_inventory_statistics_core,_iso,_first_purchase_item_labels,_first_sales_item... | S:497L
 warehouse_list_core.py[SB5M]: F:仓储管理列表查询：排序白名单、keyword、日期区间。 | R:- | A:sort_inventory_report_rows,apply_warehouse_doc_list_filters,apply_warehouse_r... | S:358L; 仓储管理列表查询：排序白名单、keyword、日期区间。
-warehouse_service.py[SB5L]: F:仓储管理服务模块  提供仓储管理相关的业务逻辑处理。  Author: Luigi Lu Date: 2025-12-30 | R:- | A:_agent_debug_ndjson,_parse_serial_numbers,_clean_outbound_batch_allocations,_... | S:17264L
+warehouse_service.py[DB8L]: F:仓储服务：出入库确认撤回与下游门禁 | R:code:riveredge-backend/src/apps/kuaizhizao/services/document_action_policy/types.py | A:SalesDeliveryService.withdraw_delivery_confirmation,FinishedGoodsReceiptService.withdraw_receipt_confirmation | S:销售出库撤回对齐删除：非待发送送货单或已确认退货禁撤；成品入库撤回卡装箱绑定与工单产品已出库
 warehouse_wo_outsource_pull_service.py[SB5L]: F:工单/委外开口行取单：列表与按行建单。 | R:- | A:encode_header_material_id,decode_header_material_id,_match_material_keyword,_... | S:1176L; 工单/委外开口行取单：列表与按行建单。
 wave_picking_service.py[SB5T]: F:波次拣货服务 (Wave Picking Service)  用于将多张叫料单/领料单合并为一张“波次拣货单”，并按照物料库位进行最优化动线排序。 解决车... | R:- | A:WavePickingService | S:95L
 work_order_group_service.py[SB5L]: F:工单组服务：创建工单组、按需求行 BOM 树下推成员工单。 | R:- | A:WorkOrderGroupService | S:871L; 工单组服务：创建工单组、按需求行 BOM 树下推成员工单。
@@ -2399,7 +2399,7 @@ work_order_mobile_kpi.py[SB5T]: F:手机工作台工单 KPI：单次聚合，不
 work_order_operation_steps.py[SB5T]: F:工单工序步骤摘要：与运营看板 / 工单列表「工序列」共用同一套 status / progress 口径。 | R:- | A:map_work_order_operation_step_status,build_work_order_operation_steps | S:54L
 work_order_readiness_service.py[SB5M]: F:工单齐套率持久化服务  - 计算口径与 get_work_order_kitting_analysis / 库位与叫料弹窗一致 - 结果写入 work_o... | R:- | A:_fixed_rate_for_status,_needs_bom_readiness,persist_kitting_analysis_result,W... | S:266L
 work_order_score_service.py[SB5L]: F:工单综合打分服务  规则加权分 + CR 交期项，支持排程 / 备料不同权重 profile。 | R:- | A:WorkOrderScoreService | S:639L
-work_order_service.py[SB5L]: F:工单业务服务模块  提供工单相关的业务逻辑处理，包括CRUD操作、状态流转等。  Author: Luigi Lu Date: 2025-01-01 | R:- | A:_batch_sop_for_master_operations,_batch_default_operators_snapshots_by_master... | S:8975L
+work_order_service.py[DB8L]: F:工单服务：下达撤回删除与下游硬校验 | R:code:riveredge-backend/src/apps/kuaizhizao/services/document_action_policy/work_order.py | A:WorkOrderService,delete_work_order,revoke_work_order,_assert_work_order_revoke_no_downstream | S:删除与撤回下达共用_assert_work_order_revoke_no_downstream；有报工领退料入库委外则禁删
 work_order_sync_service.py[SB5L]: F:生产工单从数据接口/数据集同步服务（表头行，无明细分组）。 | R:- | A:normalize_work_order_push_sync_mode,normalize_work_order_binding_sync_directi... | S:503L; 生产工单从数据接口/数据集同步服务（表头行，无明细分组）。
 work_order_tracking_service.py[SB5L]: F:工单批号/序列号追踪服务  追踪模式由物料主数据 batch_managed / serial_managed 驱动； 工单层负责计划值（开单/下达占号）... | R:- | A:WorkOrderTrackingService | S:532L
 work_order_tree_service.py[SB5M]: F:工单列表树形子行：拆分工单 / 返工单 / 工序委外单挂在原工单下 | R:- | A:_split_child_response,_rework_child_response,_outsource_child_response,WorkOr... | S:243L; 工单列表树形子行：拆分工单 / 返工单 / 工序委外单挂在原工单下
@@ -2412,7 +2412,7 @@ delivery_notice.py[CB4T]: F:送货单业务态能力 | R:code:riveredge-backend/
 demand.py[CB5S]: F:需求计划业务态能力 | R:code:riveredge-backend/src/apps/kuaizhizao/services/demand_service.py | A:derive_demand_capabilities | S:审核通过+可计算状态才合并; 已下推禁再推; 同步上游禁删; 100行
 demand_computation.py[CB5S]: F:需求计算业务态能力 | R:code:riveredge-backend/src/apps/kuaizhizao/services/demand_computation_service.py | A:derive_demand_computation_capabilities | S:执行/重算/比较三态门禁; 导出恒允许; 84行
 eight_d_report.py[CB5S]: F:8D报告业务态能力 | R:code:riveredge-backend/src/apps/kuaizhizao/services/quality_8d_service.py | A:derive_eight_d_report_capabilities | S:九阶段线性流转; 阶段字段非空校验; 137行
-enricher.py[SB5L]: F:单据 capabilities enrich（报价单试点）。 | R:- | A:_attach_capabilities_to_response,batch_document_item_counts,batch_document_it... | S:1796L; 单据 capabilities enrich（报价单试点）。
+enricher.py[SB6L]: F:单据capabilities列表与详情enrich统一入口 | R:code:riveredge-backend/src/apps/kuaizhizao/services/document_action_policy/reporting_record.py | A:enrich_reporting_record_capabilities_on_response,enrich_reporting_record_list_capabilities | S:报工enrich须传入has_posted_sales_outbound与has_approved_inbound_downstream；漏传则UI可误显可反审
 exception_process_record.py[SB5T]: F:异常处理记录业务态 capabilities（唯一真源，与 exception_process_service 门禁一致）。 | R:- | A:_cap,_norm,derive_exception_process_record_capabilities,assert_exception_proc... | S:53L
 install_execution.py[SB5S]: F:安装执行业务态 capabilities。 | R:- | A:_cap,derive_install_execution_capabilities,assert_install_execution_capability | S:111L; 安装执行业务态 capabilities。
 inventory_alert.py[SB5T]: F:库存预警记录业务态 capabilities（与 inventory_alert_service 门禁一致）。 | R:- | A:_cap,_norm,derive_inventory_alert_capabilities,assert_inventory_alert_capability | S:50L
@@ -2431,7 +2431,7 @@ quotation.py[SB5M]: F:报价单业务态 capabilities（唯一真源，与 servi
 receipt_notice.py[SB5S]: F:收货通知单业务态 capabilities（与 shipment_notice 对称）。 | R:- | A:_cap,_norm,_is_pending,_is_notified,derive_receipt_notice_capabilities,assert... | S:115L
 repair_order.py[SB5S]: F:维修单业务态 capabilities（下推派工/结算/回访）。 | R:- | A:_cap,derive_repair_order_capabilities,assert_repair_order_capability | S:104L; 维修单业务态 capabilities（下推派工/结算/回访）。
 replenishment_suggestion.py[SB5T]: F:补货建议业务态 capabilities（与 replenishment_suggestion_service 门禁一致）。 | R:- | A:_cap,_norm,_qty_positive,derive_replenishment_suggestion_capabilities,assert_... | S:84L
-reporting_record.py[SB5T]: F:报工记录业务态 capabilities（唯一真源，与 reporting_service 门禁一致）。 | R:- | A:_cap,_norm,derive_reporting_record_capabilities,assert_reporting_record_capab... | S:76L
+reporting_record.py[SB7T]: F:报工业务态capabilities真源：反审与删除门禁 | R:code:riveredge-backend/src/apps/kuaizhizao/services/document_action_policy/types.py | A:derive_reporting_record_capabilities,assert_reporting_record_capability | S:has_posted_sales_outbound或has_approved_inbound_downstream为真则禁revoke/delete；出库reason优先于入库
 rework_order.py[SB5M]: F:返工单业务态 capabilities（唯一真源）。 | R:- | A:capability_kwargs_from_context,_cap,_norm,_dec,derive_rework_order_capabiliti... | S:251L; 返工单业务态 capabilities（唯一真源）。
 sales_contract.py[SB5M]: F:销售合同业务态 capabilities（唯一真源，与 service 门禁一致）。 | R:- | A:_cap,_norm_status,_is_draft,_is_pending_review,_is_effective,_normalize_revie... | S:219L
 sales_delivery.py[SB5T]: F:销售出库单 — 送货单加载 capabilities（唯一真源）。 | R:- | A:_cap,derive_sales_delivery_pull_capabilities,assert_sales_delivery_pull_capab... | S:70L; 销售出库单 — 送货单加载 capabilities（唯一真源）。
@@ -2440,7 +2440,7 @@ sales_order.py[SB5L]: F:销售订单业务态 capabilities（唯一真源，与 
 sales_order_change.py[SB5S]: F:销售变更单业务态 capabilities（唯一真源，与 service 门禁一致）。 | R:- | A:_cap,_norm_status,_is_pending_review,_is_rejected,_is_applied,_is_audited_pen... | S:168L
 sales_return.py[SB5M]: F:销售退货单业务态 capabilities（唯一真源，与 service 门禁一致）。 | R:- | A:_cap,_norm_status,_norm_review,_is_pending,_is_draft,_is_returned | S:213L
 shipment_notice.py[SB5S]: F:发货通知单业务态 capabilities（唯一真源，与 service 门禁一致）。 | R:- | A:_cap,_norm_status,_is_pending,_is_notified,derive_shipment_notice_capabilitie... | S:114L
-types.py[SB5L]: F:单据业务态 capabilities 类型（不含 RBAC）。 | R:- | A:ActionCapability,QuotationCapabilities,SalesOrderCapabilities,SalesOrderChang... | S:894L; 单据业务态 capabilities 类型（不含 RBAC）。
+types.py[SB6L]: F:单据capabilities类型与CAPABILITY_REASON_MESSAGES | R:- | A:CAPABILITY_REASON_MESSAGES,ReportingRecordCapabilities,SalesOrderCapabilities | S:报工/销售订单下游拦截文案统一为请先反审核并删除下游；出库撤回含送货单与退货reason
 warehouse_inbound_hub.py[SB5S]: F:入库 Hub 聚合行业务态 capabilities（与 inboundHubTypes / inboundBatchConfirm 门禁一致）。 | R:- | A:_cap,_norm,_is_posted,derive_inbound_hub_capabilities,assert_inbound_hub_capa... | S:141L
 warehouse_outbound_hub.py[SB5S]: F:出库 Hub 聚合行业务态 capabilities（与 outboundHubTypes / outboundBatchConfirm 门禁一致）。 | R:- | A:_cap,_norm,_is_review_approved,_derive_delete_capability,derive_outbound_hub_... | S:188L
 work_order.py[SB5M]: F:工单业务态 capabilities（唯一真源，与 work_order_service 门禁一致）。 | R:- | A:_cap,_norm,_has_work,_is_list_work_order_row,_revoke_status_allowed,_is_manua... | S:296L
@@ -7307,7 +7307,7 @@ useCustomFields.ts[EU5M]: F:必须是纯日历日字符串；禁止把 dayjs 对
 useCustomFieldsForList.tsx[EU5S]: F:列表 API 不支持自定义字段检索/排序；避免误开前端排序造成仅当前页假排序 | R:- | A:- | S:171L; 列表 API 不支持自定义字段检索/排序；避免误开前端排序造成仅当前页假排序
 useDeferAfterPaint.ts[EU5T]: F:Implements useDeferAfterPaint.ts | R:- | A:- | S:30L
 useDetailDrawerFeatures.ts[EU5T]: F:Implements useDetailDrawerFeatures.ts | R:- | A:- | S:54L
-useDocumentCapabilities.ts[EU5L]: F:后端尚未下发 capabilities 时保持可选，避免整表锁死 | R:- | A:- | S:1761L; 后端尚未下发 capabilities 时保持可选，避免整表锁死
+useDocumentCapabilities.ts[EU6L]: F:前端单据capabilities原因文案与批量门禁钩子 | R:- | A:REPORTING_RECORD_CAPABILITY_REASON_MESSAGES,OUTBOUND_HUB_CAPABILITY_REASON_MESSAGES,SALES_ORDER_CAPABILITY_REASON_MESSAGES | S:OUTBOUND_HUB文案只定义一处；报工入库出库与销售订单下游reason须与后端types对齐
 useDocumentCodeEditability.ts[EU5T]: F:Implements useDocumentCodeEditability.ts | R:- | A:- | S:58L
 useDocumentHighlightDeepLink.ts[EU5T]: F:Implements useDocumentHighlightDeepLink.ts | R:- | A:- | S:28L
 useDocumentReplacement.ts[EU5T]: F:Implements useDocumentReplacement.ts | R:- | A:- | S:53L
@@ -7601,7 +7601,7 @@ analysis.tsx[EU5T]: F:Implements analysis.tsx | R:- | A:- | S:1L
 dashboardCardSurface.ts[EU5T]: F:Implements dashboardCardSurface.ts | R:- | A:- | S:10L
 dashboardTopBarTheme.ts[EU5T]: F:Implements dashboardTopBarTheme.ts | R:- | A:- | S:39L
 index.tsx[EU5L]: F:克制色：浅底 + 同系文字，避免高饱和色块 | R:- | A:- | S:980L; 克制色：浅底 + 同系文字，避免高饱和色块
-platformUpdateLog.ts[FD5L]: F:定义工作台通用更新目录，合并定制日志并按租户应用、日期和类型筛选 | R:code:riveredge-frontend/src/pages/system/dashboard/platformUpdateLogDedicated.ts | A:getRecentPlatformUpdates,filterVisiblePlatformUpdates,groupPlatformUpdatesByDate | S:定制记录仅对已启用对应应用可见；日期降序同日通用在前；文本键同步zh-CN；不收录HaoliGO和造数工具
+platformUpdateLog.ts[FD5L]: F:工作台通用更新目录合并定制日志并筛选 | R:code:riveredge-frontend/src/pages/system/dashboard/platformUpdateLogDedicated.ts | A:PLATFORM_UPDATE_LOG_GENERAL,getRecentPlatformUpdates | S:用户可见改动插GENERAL头部；须同步zh-CN title/description键；不收录HaoliGO与造数工具
 platformUpdateLogDedicated.ts[EU5L]: F:Implements platformUpdateLogDedicated.ts | R:- | A:- | S:812L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/pages/system/dashboard/analysis/===

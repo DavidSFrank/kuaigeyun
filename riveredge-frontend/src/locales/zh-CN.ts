@@ -30119,6 +30119,10 @@ export default {
     '登录地点广州等城市不再截成单字',
   'pages.dashboard.updateLog.entries.login-log-location-zhou-suffix-r01.description':
     'IP 解析去行政区后缀时误把「州」当成尾缀，导致「广州」显示成「广」。现已保留两字市名，并优先识别「自治州」等完整后缀。',
+  'pages.dashboard.updateLog.entries.reporting-block-revoke-after-sales-outbound-r01.title':
+    '下推单据须先反审再删，禁止跳级冲销上游',
+  'pages.dashboard.updateLog.entries.reporting-block-revoke-after-sales-outbound-r01.description':
+    '销售订单下推生产工单/采购订单后，须先反审核并删除这些下游，才能反审或删除销售订单；需求计算撤回不再级联吞掉未执行工单。报工若已有已审核/已入库的生产入库单，须先反审删除入库再反审报工；销售已出库亦不可冲报工；出库撤回须先处理送货单/退货。',
   'pages.dashboard.updateLog.entries.pc-audit-unreview-empty-pending-r01.title':
     '审核反审核不再出现空壳待审与审计静默',
   'pages.dashboard.updateLog.entries.pc-audit-unreview-empty-pending-r01.description':
