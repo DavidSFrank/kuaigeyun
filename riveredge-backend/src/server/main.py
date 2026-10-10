@@ -518,6 +518,22 @@ except Exception as _client_static_err:
     logger.warning("客户端静态目录挂载跳过: {}", _client_static_err)
 
 
+@app.get("/robots.txt")
+async def root_robots_txt():
+    """站点根路径 robots.txt：按平台设置「是否接受被搜索引擎收录」动态生成。"""
+    from fastapi.responses import PlainTextResponse
+    from infra.api.platform_settings.public import _robots_txt_body
+    from infra.services.platform_settings_service import PlatformSettingsService
+
+    try:
+        settings = await PlatformSettingsService().get_or_create_default_settings()
+        allow = getattr(settings, "search_engine_indexing_enabled", True) is not False
+        return PlainTextResponse(_robots_txt_body(allow_indexing=allow), media_type="text/plain")
+    except Exception as exc:
+        logger.error("根路径 robots.txt 生成失败，默认允许收录: {}", exc, exc_info=True)
+        return PlainTextResponse(_robots_txt_body(allow_indexing=True), media_type="text/plain")
+
+
 @app.get("/api/debug/batches")
 async def debug_batches():
     try:

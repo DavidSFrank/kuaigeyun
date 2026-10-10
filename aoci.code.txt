@@ -84,7 +84,7 @@ systemd-exec-taskiq-worker.sh[OV1T]: F:taskiq worker exec | R:- | A:worker tasks
 
 ===D:/kuaigeyun-pro/kuaigeyun/fast-deploy/templates/===
 Caddyfile.dev-api.template[CC1T]: F:dev Caddy API proxy | R:- | A:BG dev proxy | S:stable port for BG; 36L
-Caddyfile.template[CC4M]: F:prod Caddy config | R:- | A:reverse+static+redirects | S:long-running 300s; /m→/mobile; 214L
+Caddyfile.template[OC4M]: F:prod Caddy 模板反代API与静态站 | R:code:riveredge-backend/src/infra/api/platform_settings/public.py | A:- | S:长耗时接口300s;/m→/mobile;/robots.txt反代后端按收录开关出文;域名校验*.txt禁回落SPA
 riveredge-backend.service.template[CC1T]: F:backend systemd unit | R:- | A:uvicorn service | S:Restart=always; malloc env; 29L
 riveredge-caddy.service.template[CC1T]: F:Caddy systemd unit | R:- | A:Caddy service | S:Conflicts=caddy; Restart=always; 26L
 riveredge-taskiq-scheduler.service.template[FC1T]: F:taskiq scheduler systemd unit | R:- | A:Restart=always | S:PartOf riveredge.service; 27L
@@ -1045,6 +1045,9 @@ config-center-ops.md[SO2T]: F:config center ops | R:- | A:3 control points | S:c
 845_20261008193000_backfill_login_location_zhou_suffix.py[PD4T]: F:回填登录地错误「州」后缀 | R:code:riveredge-backend/src/core/utils/ip_parser.py | A:upgrade | S:调repair_truncated_zhou_city_login_location写core_login_logs; downgrade空操作
 846_20261010080000_product_firmware_software_item_code.py[PD4T]: F:产品固件软件12位编码列迁移 | R:code:riveredge-backend/src/apps/kuaiplm/models/product_firmware.py | A:upgrade,downgrade | S:nullable software_item_code VARCHAR(12); 定制页录入
 847_20261010084500_issue_grants_audit_columns.py[PD4T]: F:下发grant表补审计列迁移 | R:code:riveredge-backend/migrations/models/843_20261008113000_rd_deliverable_issue.py | A:upgrade,downgrade | S:两grant表ADD created_by/updated_by*; 修列表SELECT 500
+848_20261010120000_kuaioa_reward_performance_score.py[PB3T]: F:奖励表加performance_score列迁移 | R:code:riveredge-backend/src/apps/kuaioa/models/payroll.py | A:upgrade,downgrade | S:reward_records.performance_score可空NUMERIC(10,2)
+849_20261010123000_kuaioa_leave_slip_file.py[PB3T]: F:请假表加请假条附件UUID迁移 | R:code:riveredge-backend/src/apps/kuaioa/models/leave.py | A:upgrade,downgrade | S:leave_slip_file_uuid VARCHAR(36); IF NOT EXISTS
+850_20261010124500_platform_settings_search_engine_indexing.py[PB3T]: F:平台设置加搜索引擎收录开关迁移 | R:code:riveredge-backend/src/infra/models/platform_settings.py | A:upgrade,downgrade | S:search_engine_indexing_enabled默认TRUE
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/scripts/===
 pack_sensitive_words.py[XC3T]: F:敏感词打包脚本 | R:code:riveredge-backend/pyproject.toml | A:lexicon pack | S:gh mirror fallback; 90L
@@ -1370,7 +1373,7 @@ license_types.py[AC2T]: F:证照事项类型预置 | R:code:riveredge-backend/sr
 form_request_issue.py[KC4T]: F:会签下发目标类型与附件字段常量 | R:- | A:FORM_REQUEST_ISSUE_TARGET_TYPES | S:issue范围含tech_work_contact/confirmation/review_sheet/material_issue; 维护人权限update|approve
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/src/apps/kuaioa/===
-manifest.json[FC4L]: F:轻办公应用清单 | R:code:riveredge-backend/src/apps/kuaioa/__init__.py | A:- | S:菜单指向kuaioa路由; 员工/考勤/薪酬/表单/培训/证照/资产/福利八组
+manifest.json[FC4L]: F:轻办公应用清单菜单权限 | R:code:riveredge-frontend/src/apps/kuaioa/manifest.json | A:- | S:已移除资产台账菜单仅留采买; 台账走轻财务
 orm_models.py[AC2T]: F:快办公ORM模块注册表 | R:code:riveredge-backend/src/apps/kuaioa/models/form_request_issue.py | A:ORM_MODEL_MODULES | S:须含form_request_issue否则grant模型不加载
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/src/apps/kuaioa/models/===
@@ -1382,10 +1385,10 @@ daily_attendance.py[PD2T]: F:每日考勤登记记录模型 | R:code:riveredge-b
 employee.py[PD5T]: F:员工档案模型 | R:- | A:KuaioaEmployeeProfile | S:可无登录账号含临时工; 计薪方式piece/time/line; 工资标准快照在档案
 form_request.py[PD3T]: F:自定义审批申请单模型含下发字段 | R:code:riveredge-backend/src/apps/kuaioa/models/form_template.py | A:KuaioaFormRequest | S:tenant+request_code唯一; form_data JSON; 含issued_*
 form_template.py[PD2T]: F:审批表单模板模型 | R:code:riveredge-backend/src/apps/kuaioa/constants/general_signoff_business_types.py | A:KuaioaFormTemplate | S:字段定义JSON; 业务类型空=普通自定义; 可挂自定义审批菜单分组
-leave.py[PD3S]: F:请假出差申请模型 | R:code:riveredge-backend/src/apps/kuaioa/api/leave.py | A:KuaioaLeaveRequest | S:天数或不足一天小时; 可勾选扣款金额; 出差目的地字段
+leave.py[PD3S]: F:请假出差申请模型 | R:code:riveredge-backend/src/apps/kuaioa/api/leave.py | A:KuaioaLeaveRequest | S:leave_slip_file_uuid存请假条附件; 天数或不足一天小时; 可勾选扣款金额
 license.py[PD2T]: F:证照台账模型 | R:code:riveredge-backend/src/apps/kuaioa/constants/license_types.py | A:KuaioaLicense | S:证照码租户唯一; 到期提醒天数默认30; 提醒渠道internal/email/sms
 minimum_wage.py[PD1T]: F:最低工资标准配置模型 | R:code:riveredge-backend/src/apps/kuaioa/api/minimum_wage.py | A:KuaioaMinimumWageConfig | S:按生效日取最新; 金额2位小数
-payroll.py[PD5S]: F:生活费预支/奖励/工资结算模型 | R:- | A:KuaioaPayrollSettlement,KuaioaPayrollSettlementLine | S:结算行过账快照写死禁读侧enrich; 应发/扣除/结余三分段金额
+payroll.py[PD5S]: F:生活费预支奖励工资结算模型 | R:code:riveredge-backend/src/apps/kuaioa/services/payroll_service.py | A:KuaioaPayrollSettlement,KuaioaRewardRecord | S:奖励performance_score可空定制录入; 结算行过账快照禁读侧enrich
 post_subsidy.py[PD1T]: F:岗位补贴登记模型 | R:code:riveredge-backend/src/apps/kuaioa/api/post_subsidy.py | A:KuaioaPostSubsidy | S:补贴项目多行登记; 结算重建时写入夜班/高温/岗位津贴列
 seal.py[PD2T]: F:用章申请模型 | R:code:riveredge-backend/src/apps/kuaioa/api/seal.py | A:KuaioaSealRequest | S:印章类型+文件+份数; 外带标记; 来源实体四字段追溯
 training.py[PD5M]: F:培训计划/记录/上岗证/模板模型 | R:code:riveredge-backend/src/apps/kuaioa/api/training.py | A:KuaioaTrainingPlan,KuaioaTrainingRecord,KuaioaWorkLicense | S:记录区分content/production/qc类型; 人力确认时间戳; 上岗证有效期
@@ -1400,10 +1403,10 @@ collaboration.py[PD3M]: F:制造协同schemas | R:code:riveredge-backend/src/app
 daily_attendance.py[PD2S]: F:每日考勤schemas | R:code:riveredge-backend/src/apps/kuaioa/models/daily_attendance.py | A:DailyAttendanceCreate | S:打卡时间HH:mm字符串; 员工字段可空
 employee.py[PD3T]: F:员工档案schemas | R:- | A:EmployeeProfileCreate,EmployeeBulkCreateRequest | S:批量导入单次最多200条; 员工码可空由服务生成
 forms.py[PD3T]: F:审批表单Pydantic schemas含下发入参 | R:code:riveredge-backend/src/apps/kuaioa/models/form_template.py | A:FormTemplateCreate,FormRequestCreate,FormRequestIssueRequest | S:fields_schema为List[Any]; 申请可无模板
-leave.py[PD2S]: F:请假出差schemas | R:code:riveredge-backend/src/apps/kuaioa/models/leave.py | A:LeaveRequestCreate | S:空串转None校验器; 扣款默认关
+leave.py[PD2S]: F:请假出差schemas | R:code:riveredge-backend/src/apps/kuaioa/models/leave.py | A:LeaveRequestCreate,LeaveRequestUpdate | S:含leave_slip_file_uuid; 空串转None; 扣款默认关
 license.py[PD2T]: F:证照schemas | R:code:riveredge-backend/src/apps/kuaioa/models/license.py | A:LicenseCreate | S:提醒天数默认30; 通知渠道默认开
 minimum_wage.py[PD1T]: F:最低工资schemas | R:code:riveredge-backend/src/apps/kuaioa/models/minimum_wage.py | A:MinimumWageCreate | S:生效日YYYY-MM-DD字符串
-payroll.py[PD3T]: F:薪酬schemas | R:- | A:LivingAdvanceCreate,PayrollSettlementCreate | S:预支银行/卡号回写档案; 结算行17个金额字段可选更新
+payroll.py[PD3T]: F:薪酬schemas | R:code:riveredge-backend/src/apps/kuaioa/models/payroll.py | A:LivingAdvanceCreate,RewardRecordCreate | S:奖励含performance_score; 预支银行卡号可回写档案
 payroll_import.py[PD1T]: F:结算行导入schemas | R:code:riveredge-backend/src/apps/kuaioa/schemas/payroll.py | A:PayrollLineImportRow | S:导入行员工姓名+金额; target_field限basic_wage/piece_wage
 post_subsidy.py[PD1T]: F:岗位补贴schemas | R:code:riveredge-backend/src/apps/kuaioa/models/post_subsidy.py | A:PostSubsidyCreate | S:年月YYYY-MM长度7; 金额Decimal
 seal.py[PD2T]: F:用章申请schemas | R:code:riveredge-backend/src/apps/kuaioa/models/seal.py | A:SealRequestCreate | S:份数≥1; 来源实体四字段可空
@@ -1415,7 +1418,7 @@ announcement_service.py[DB5M]: F:公告通知服务 | R:code:riveredge-backend/s
 approval_helper.py[DB4M]: F:轻办公审批流辅助 | R:code:riveredge-backend/src/apps/kuaioa/services/kuaioa_approval_doc_service.py | A:start_approval,cancel_approval | S:7个审计节点key; 审批未激活抛ValidationError; 手动动作受gate拦截
 asset_service.py[DB8L]: F:固定资产采买与台账服务 | R:code:riveredge-backend/src/apps/kuaioa/api/assets.py | A:AssetPurchaseService,AssetRegistryService | S:阶段只能+1推进不可回退; 建卡调kuaicaiwu FaAssetService; 报废须先销账
 attendance_analysis_service.py[DA5M]: F:考勤分析报表服务 | R:code:riveredge-backend/src/apps/kuaioa/api/attendance_analysis.py | A:AttendanceAnalysisService.analyze | S:区间≤800天; 结果码兼容中文别名; 员工排行Top50; 出勤率排除休息样本
-attendance_service.py[DB8L]: F:月度考勤单服务 | R:- | A:AttendanceService | S:提交锁定日格; 入职次日可填/离职次日禁填; 请假回写未提交日格; Excel openpyxl导出
+attendance_service.py[DB8L]: F:月度考勤单服务 | R:code:riveredge-backend/src/apps/kuaioa/models/attendance.py | A:AttendanceService | S:日格day_kind=weekday|weekend|legal; 周末法定加班与日常加班分桶; 法定日来自主数据LEGAL假日; 周末法定须手填加班不可默认正班
 collaboration_service.py[DB4M]: F:制造协同三类申请服务 | R:code:riveredge-backend/src/apps/kuaioa/api/collaboration.py | A:SpecialPriceRequestService | S:特价/让步/工艺偏差共用审批单据基类; 单号前缀SP/CN/PD; 偏离开始<结束校验
 daily_attendance_service.py[DB4M]: F:每日考勤登记服务 | R:code:riveredge-backend/src/apps/kuaioa/api/daily_attendance.py | A:DailyAttendanceService | S:员工同日唯一; 打卡时间兼容ISO规范化HH:mm; 时长/分钟禁负
 employee_service.py[DB5M]: F:员工档案服务 | R:- | A:EmployeeProfileService | S:用工类型formal/temp/labor; 码冲突重试8次; 离职日存在强制status=left
@@ -1431,11 +1434,11 @@ kuaioa_license_notification_presets.py[AC3S]: F:证照消息提醒规则预设 |
 kuaioa_list_core.py[DL4M]: F:轻办公通用列表与编码辅助 | R:code:riveredge-backend/src/apps/kuaioa/services/form_service.py | A:generate_daily_code,build_keyword_q | S:按日编码前缀+日期+4位序号; 日期解析兼容Excel序列号; touch_updated int时查用户解析姓名
 kuaioa_training_notification.py[AC2T]: F:培训消息提醒常量与派发 | R:code:riveredge-backend/src/apps/kuaioa/services/kuaioa_training_notification_presets.py | A:dispatch_kuaioa_training_notification | S:6个培训动作常量; 派发异常吞掉记日志返0
 kuaioa_training_notification_presets.py[AC5M]: F:培训消息提醒规则预设 | R:code:riveredge-backend/src/apps/kuaioa/services/kuaioa_training_notification.py | A:KUAIOA_TRAINING_NOTIFICATION_RULE_PRESETS | S:6条预置全默认关; 培训申请窗口/年度计划窗口/内容逾期/特种资格/上岗证到期
-leave_service.py[DB5L]: F:请假出差服务 | R:code:riveredge-backend/src/apps/kuaioa/api/leave.py | A:LeaveRequestService | S:标题缺省由类型+员工+日期拼; 同日不足8h折算leave_hours; 批准后回写月度考勤日格
+leave_service.py[DB5L]: F:请假出差服务 | R:code:riveredge-backend/src/apps/kuaioa/models/leave.py | A:LeaveRequestService | S:透传leave_slip_file_uuid; 批准后回写月度考勤日格; 同日不足8h折算leave_hours
 license_reminder_service.py[DM5M]: F:证照到期提醒服务 | R:code:riveredge-backend/src/apps/kuaioa/services/kuaioa_license_notification.py | A:LicenseReminderService | S:站点时区9点登记due_soon/overdue双事件; 到期日变更即停旧事件; 证照删除停提醒
 license_service.py[DB5M]: F:证照台账服务 | R:code:riveredge-backend/src/apps/kuaioa/api/licenses.py | A:LicenseRegistryService | S:保存后同步到期提醒; 渠道/收件人白名单规范化; 临期列表含天数差
 minimum_wage_service.py[DB3S]: F:最低工资配置服务 | R:code:riveredge-backend/src/apps/kuaioa/api/minimum_wage.py | A:MinimumWageService | S:金额须>0; 当前值按生效日取最新; 带year_month时委托薪酬服务解析
-payroll_service.py[DB9L]: F:薪酬结算核心服务 | R:- | A:PayrollSettlementService | S:结算行自动重建快照; 预支回写档案银行/卡号; 结余=应发-扣除-打卡; 含最低工资解析与年度统计
+payroll_service.py[DB9L]: F:薪酬结算核心服务 | R:code:riveredge-backend/src/apps/kuaioa/models/payroll.py | A:PayrollSettlementService | S:奖励读写performance_score; 结算行自动重建快照; 结余=应发-扣除-打卡
 post_subsidy_service.py[DB3S]: F:岗位补贴服务 | R:code:riveredge-backend/src/apps/kuaioa/api/post_subsidy.py | A:PostSubsidyService | S:金额须>0; 员工快照写入; 按年月/车间/关键词过滤
 seal_service.py[DB2S]: F:用章申请服务 | R:code:riveredge-backend/src/apps/kuaioa/api/seal.py | A:SealRequestService | S:基于审批单据通用服务; 单号前缀SR; 审批决定仅通过gate拦截手动动作
 training_distribution_service.py[DW5M]: F:年度培训计划下发通知 | R:code:riveredge-backend/src/apps/kuaioa/services/kuaioa_training_notification_presets.py | A:notify_annual_plan_distributed | S:部门申请已批准者不再收窗口提醒; 通知申请部门+体系; 接收人取配置规则
@@ -3103,7 +3106,7 @@ permission_modules.py[DB5T]: F:权限模块配置  定义权限的模块分组�
 pro_app_catalog.py[DB5T]: F:PRO 应用清单（许可证适用范围唯一真源）。  与前端 proAppCatalog.ts 的 PRO_APP_CODES 保持一致。 | R:- | A:resolve_application_sort_order,normalize_license_scope,is_valid_license_scope | S:59L
 scheduled_job_registry.py[DB5T]: F:租户级内置定时任务目录（唯一真源）。  业务配置「定时任务」Tab 展示并可编辑 cron/启用；执行由 ScheduledTask + schedule... | R:- | A:ScheduledJobPreset,get_preset | S:98L
 system_dictionaries.py[DB5L]: F:系统字典定义配置模块  定义所有系统字典及其字典项的配置，用于租户初始化时自动创建。  Author: Luigi Lu Date: 2026-01-16 | R:- | A:- | S:751L
-system_menu_config.py[DB5T]: F:系统级菜单真源配置（用于落库同步）。 | R:- | A:- | S:99L; 系统级菜单真源配置（用于落库同步）。
+system_menu_config.py[FC4T]: F:系统级菜单真源配置落库同步 | R:- | A:- | S:仅系统中心菜单; 业务应用菜单以各app manifest为准
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/src/core/data/sensitive_words/===
 LICENSE.konsheng-sensitive-lexicon[DU5T]: F:MIT License Copyright (c) 2024~2099 Konsheng Permission is hereby granted, fr... | R:- | A:- | S:21L
@@ -3726,7 +3729,7 @@ install_register.py[IB5T]: F:实例安装登记 API  POST /install/register — 
 official_api_library.py[IB5M]: F:官方接口库公开 API（固定托管于 kuaigeyun.com）  公开： GET  /packs — 已发布目录 GET  /packs/{pack_i... | R:- | A:_assert_official_host,_assert_can_manage,OfficialApiLibraryItemIn,OfficialApi... | S:321L
 platform_settings.py[IB5S]: F:平台设置管理 API 模块  提供平台设置管理相关的 RESTful API 接口。  Author: Auto (AI Assistant) Date:... | R:- | A:get_platform_settings,create_platform_settings,update_platform_settings,delet... | S:122L
 provenance.py[IB5T]: F:构建来源公开 API  GET /platform/provenance — 软标识信息，不阻断业务。 | R:- | A:BuildProvenanceResponse,get_build_provenance | S:43L
-public.py[IB5S]: F:平台设置公开API模块  提供不需要认证的平台设置查询接口，用于登录页等公开页面。  Author: Auto (AI Assistant) Date: ... | R:- | A:get_platform_settings_public | S:147L
+public.py[IB5S]: F:平台设置公开API含robots | R:code:riveredge-backend/src/infra/services/platform_settings_service.py | A:get_platform_settings_public,get_platform_robots_txt | S:robots按search_engine_indexing_enabled出Allow或Disallow; 读失败默认允许收录; 供Caddy根路径反代
 version.py[IB5S]: F:平台版本与迭代信息 API  提供系统构建时间、代码仓库最新提交时间等，用于右下角悬浮按钮展示。 公开接口，无需认证。 时间统一以 ISO 8601 UT... | R:- | A:PlatformVersionResponse,_try_git_short_sha_from_worktree,_normalize_to_iso_ut... | S:147L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/src/infra/api/saved_searches/===
@@ -3802,7 +3805,7 @@ infra_superadmin.py[PB5S]: F:平台超级管理员模型模块  定义平台超�
 install_registration.py[PB5T]: F:实例安装登记模型  平台级表，记录可选遥测登记（构建来源元数据，不含业务数据）。 | R:- | A:InstallRegistration | S:43L
 official_api_library.py[PB5T]: F:官方接口库模型  平台级表，仅在 kuaigeyun.com 官方 SaaS 落库；私有部署经固定地址拉取/提交。 | R:- | A:OfficialApiLibraryPack | S:41L
 package.py[PB5T]: F:套餐模型模块  定义套餐数据模型，用于套餐管理 | R:- | A:Package | S:69L; 套餐模型模块  定义套餐数据模型，用于套餐管理
-platform_settings.py[PB5M]: F:平台设置模型模块  定义平台设置数据模型，用于存储平台级配置信息。  Author: Auto (AI Assistant) Date: 2026-01-06 | R:- | A:PlatformSettings | S:234L
+platform_settings.py[PB5M]: F:平台设置ORM模型 | R:code:riveredge-backend/src/infra/services/platform_settings_service.py | A:PlatformSettings | S:search_engine_indexing_enabled默认True; 关闭时robots与前端meta拒绝爬取
 saved_search.py[PB5T]: F:保存搜索条件模型模块  定义保存搜索条件数据模型，用于存储用户保存的搜索条件 | R:- | A:SavedSearch | S:61L; 保存搜索条件模型模块  定义保存搜索条件数据模型，用于存储用户保存的搜索条件
 sensitive_word_control.py[PB5T]: F:敏感词黑名单、违规日志与组织级敏感词放行。 | R:- | A:SensitiveWordViolation,SensitiveWordBan,TenantSensitiveWordAllowlist | S:56L; 敏感词黑名单、违规日志与组织级敏感词放行。
 tenant.py[PB5S]: F:组织模型模块  定义组织数据模型，用于多组织系统的组织管理 | R:- | A:TenantStatus,TenantPlan,tenant_plan_sort_rank,Tenant | S:144L; 组织模型模块  定义组织数据模型，用于多组织系统的组织管理
@@ -3821,7 +3824,7 @@ infra_superadmin.py[DB5S]: F:平台超级管理员 Schema 模块  定义平台�
 init_wizard.py[DB5S]: F:初始化向导 Schema 模块  定义初始化向导相关的 Pydantic Schema，用于数据验证和序列化。  Author: Luigi Lu Dat... | R:- | A:InitStepConfig,InitWizardStepResponse,InitStepsResponse,Step1OrganizationInfo... | S:106L
 license_center.py[DB5T]: F:许可证中心 Schema。  用于平台级 License Key 管理（只保存摘要，不保存明文）。 | R:- | A:PlatformLicenseCreateRequest,PlatformLicenseResponse,PlatformLicenseGenerateR... | S:40L
 package.py[DB5S]: F:套餐管理 Schema 模块  定义套餐相关的 Pydantic Schema，用于 API 请求和响应的数据验证 | R:- | A:PackageBase,PackageCreate,PackageUpdate,PackageResponse,PackageListResponse | S:113L
-platform_settings.py[DB5S]: F:平台设置数据验证Schema模块  提供平台设置相关的数据验证和序列化。  Author: Auto (AI Assistant) Date: 2026-... | R:- | A:PlatformSettingsBase,PlatformSettingsCreate,PlatformSettingsUpdate,PlatformSe... | S:140L
+platform_settings.py[DB5S]: F:平台设置Pydantic schemas | R:code:riveredge-backend/src/infra/models/platform_settings.py | A:PlatformSettingsBase,PlatformSettingsUpdate | S:公开与更新均含search_engine_indexing_enabled可选布尔
 saved_search.py[DB5T]: F:保存搜索条件 Schema 模块  定义保存搜索条件相关的 Pydantic Schema，用于 API 请求和响应的数据验证 | R:- | A:SavedSearchBase,SavedSearchCreate,SavedSearchUpdate,SavedSearchResponse,Saved... | S:95L
 sensitive_word_blacklist.py[DB5T]: F:敏感词黑名单 API 模型。 | R:- | A:SensitiveWordBlacklistMetaResponse,SensitiveWordBanItem,SensitiveWordBanListR... | S:57L; 敏感词黑名单 API 模型。
 tenant.py[DB5M]: F:组织 Schema 模块  定义组织相关的 Pydantic Schema，用于 API 请求和响应的数据验证 | R:- | A:TenantBase,TenantAdminAccountCreate,TenantCreate,TenantUpdate,TenantResponse,... | S:345L
@@ -3842,7 +3845,7 @@ license_center_service.py[SB5M]: F:平台许可证中心服务。  提供平台�
 login_brute_force_guard.py[SB5T]: F:登录防暴力破解守卫  PG Cache（CacheEntry）为跨进程失败计数与锁定真源；禁止进程内 limiter 或前端长按冒充防护。 | R:- | A:normalize_login_identity,_retry_minutes,_fail_key,_lock_key,LoginBruteForceGuard | S:96L
 official_api_library_service.py[SB5L]: F:官方接口库服务  - 官方 SaaS（INSTALL_REPO_SUMMARY_ADMIN_ENABLED）：直接读写本地表 - 其它部署：经 platf... | R:- | A:_slugify_pack_id,_strip_sensitive_headers,normalize_official_api_item,pack_to... | S:470L
 package_service.py[SB5M]: F:套餐服务模块  提供套餐的 CRUD 操作和业务逻辑处理 | R:- | A:PackageService | S:314L; 套餐服务模块  提供套餐的 CRUD 操作和业务逻辑处理
-platform_settings_service.py[SB5M]: F:平台设置服务模块  提供平台设置相关的业务逻辑处理。  Author: Auto (AI Assistant) Date: 2026-01-06 | R:- | A:PlatformSettingsService | S:213L
+platform_settings_service.py[SB5M]: F:平台设置读写服务 | R:code:riveredge-backend/src/infra/models/platform_settings.py | A:PlatformSettingsService | S:创建更新透传search_engine_indexing_enabled; 公开读供登录页与robots
 saved_search_service.py[SB5M]: F:保存搜索条件服务模块  提供保存搜索条件的 CRUD 操作和业务逻辑处理 | R:- | A:SavedSearchService | S:207L; 保存搜索条件服务模块  提供保存搜索条件的 CRUD 操作和业务逻辑处理
 sensitive_word_blacklist_service.py[SB5M]: F:敏感词黑名单与组织级放行服务。 | R:- | A:_truncate_snippet,SensitiveWordBlacklistService | S:285L; 敏感词黑名单与组织级放行服务。
 service_registry.py[SB5S]: F:平台级服务注册表  为平台级服务提供统一的管理机制，与系统级服务注册表分离。  Author: Luigi Lu Date: 2025-12-27 | R:- | A:InfraServiceRegistry,InfraServiceLocator,ServiceNotFoundError | S:179L
@@ -3873,7 +3876,7 @@ simple_rate_limit.py[DB5T]: F:进程内滑动窗口限流（用于公开登记�
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/src/server/===
 __init__.py[DB5T]: F:Implements __init__.py | R:- | A:- | S:5L
 dev_reload.py[DB5S]: F:开发热重载配置（run_dev_server / main 唯一入口）。  uvicorn 0.30 的 WatchFilesReload 会把 cwd ... | R:- | A:_reload_enabled,_is_reloadable_py,_watch_filter,_install_watchfiles_src_only,... | S:112L
-main.py[DB5L]: F:RiverEdge App - SaaS平台主服务  作为平台宿主的后端服务，整合 infra 和 core 模块提供平台级和系统级功能。 | R:- | A:lifespan,debug_batches,debug_materials,_riveredge_exception_handler,load_plug... | S:1013L
+main.py[EB8L]: F:SaaS宿主FastAPI入口与生命周期 | R:code:riveredge-backend/src/infra/api/platform_settings/public.py | A:lifespan,root_robots_txt | S:根路径/robots.txt按平台收录开关生成; 失败默认允许收录; 应用路由启动期动态挂载
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-backend/src/server/doc_assets/redoc/===
 redoc.standalone.js[DU5L]: F:! For license information please see redoc.standalone.js.LICENSE.txt | R:- | A:- | S:1833L
@@ -3987,7 +3990,7 @@ uni-table-search-pagination.mjs[OU5T]: F:/** * 通用表格服务端搜索分页
 uni-table-selection.mjs[OU5S]: F:/** * Real-browser regression for UniTable's controlled-selection feedback lo... | R:- | A:- | S:158L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/===
-app.tsx[EU5L]: F:使用 routes 中的路由配置 | R:- | A:- | S:932L; 使用 routes 中的路由配置
+app.tsx[EU6L]: F:前端根应用路由与全局副作用 | R:code:riveredge-frontend/src/utils/searchEngineIndexing.ts | A:- | S:拉取公开平台设置后调用applySearchEngineIndexing写meta robots
 first-paint.css[DU5T]: F:html, body { margin: 0; padding: 0; height: 100%; box-sizing: border-box; } * { | R:- | A:- | S:17L
 global.less[DU5L]: F:/** * RiverEdge SaaS 多组织框架 - 全局样式 * * 只保留必要的全局样式，尽量使用 Ant Design 原生样式 */ :roo... | R:- | A:- | S:4193L
 index.html[DU5M]: F:<!doctype html> <html lang="zh-CN"> <head> <meta charset="UTF-8" /> <link rel... | R:- | A:- | S:209L
@@ -4381,7 +4384,7 @@ index.tsx[EU5T]: F:Implements index.tsx | R:- | A:- | S:18L
 AssetAssignModal.tsx[EU5T]: F:Implements AssetAssignModal.tsx | R:- | A:- | S:61L
 FormRequestModalBody.tsx[EU5S]: F:Implements FormRequestModalBody.tsx | R:- | A:- | S:100L
 FormTemplateModalBody.tsx[EU5T]: F:Implements FormTemplateModalBody.tsx | R:- | A:- | S:86L
-KuaioaCrudListPage.tsx[EU5L]: F:与车辆管理同构：名称/标题唯一 RemainderFlex，禁止全 KeepWidth | R:- | A:- | S:1216L
+KuaioaCrudListPage.tsx[EU6L]: F:轻办公统一CRUD列表壳 | R:code:riveredge-frontend/src/components/uni-table/UniTable.tsx | A:KuaioaCrudListPage | S:名称标题唯一RemainderFlex; 行缓存走onTableDataChange; 支持file字段与详情抽屉
 KuaioaDetailDrawer.tsx[EU5S]: F:Implements KuaioaDetailDrawer.tsx | R:- | A:- | S:196L
 OaDynamicFormFields.tsx[EU5M]: F:Implements OaDynamicFormFields.tsx | R:- | A:- | S:324L
 OaFormSchemaPuckEditor.tsx[EU5S]: F:Implements OaFormSchemaPuckEditor.tsx | R:- | A:- | S:105L
@@ -4395,8 +4398,8 @@ FormRequestSalesReplyModal.tsx[AW5T]: F:Implements FormRequestSalesReplyModal.ts
 generalSignoffBusinessTypes.ts[EU5T]: F:Implements generalSignoffBusinessTypes.ts | R:- | A:- | S:17L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaioa/===
-index.tsx[EU5S]: F:Implements index.tsx | R:- | A:- | S:141L
-manifest.json[FC5L]: F:root keys: code, name, version, description, icon, author, market_category, i... | R:- | A:- | S:650L
+index.tsx[EU5S]: F:轻办公前端路由表 | R:code:riveredge-frontend/src/apps/kuaioa/manifest.json | A:KuaioaApp | S:assets/registry Navigate到轻财务固定资产清单; 采买路由仍保留
+manifest.json[FC5L]: F:轻办公前端应用清单 | R:code:riveredge-backend/src/apps/kuaioa/manifest.json | A:- | S:行政办公固定资产仅采买菜单; 无资产台账项
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaioa/pages/admin/announcements/===
 index.tsx[EU5S]: F:Implements index.tsx | R:- | A:- | S:100L
@@ -4443,7 +4446,7 @@ index.tsx[EU5L]: F:兼容历史中文结果与 code | R:- | A:- | S:510L; 兼容
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaioa/pages/hr/attendance/===
 day-register.tsx[EU5M]: F:Implements day-register.tsx | R:- | A:- | S:344L
-fill.tsx[EU5L]: F:Implements fill.tsx | R:- | A:- | S:429L
+fill.tsx[EU6L]: F:月度考勤填报页 | R:code:riveredge-backend/src/apps/kuaioa/services/attendance_service.py | A:- | S:按day_kind分日常/周末/法定加班录入; 周末法定禁默认正班须手填加班
 index.tsx[EU5M]: F:Implements index.tsx | R:- | A:- | S:231L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaioa/pages/hr/dept-training-applications/===
@@ -4456,7 +4459,7 @@ index.tsx[EU5L]: F:Implements index.tsx | R:- | A:- | S:689L
 index.tsx[EU5L]: F:Implements index.tsx | R:- | A:- | S:763L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaioa/pages/hr/leave/===
-index.tsx[EU5L]: F:Implements index.tsx | R:- | A:- | S:456L
+index.tsx[EU5L]: F:请假出差列表页 | R:code:riveredge-frontend/src/apps/kuaioa/components/KuaioaCrudListPage.tsx | A:- | S:表单含请假条附件leave_slip_file_uuid; 审批走auditWorkflow
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaioa/pages/hr/living-advances/===
 index.tsx[EU5M]: F:Implements index.tsx | R:- | A:- | S:355L
@@ -5322,10 +5325,10 @@ availableInventoryCell.tsx[EU5M]: F:文案由父级 t 注入会更干净；此�
 mrpExceptionHelpers.ts[EU5T]: F:Implements mrpExceptionHelpers.ts | R:- | A:- | S:57L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaizhizao/pages/plan-management/demand-management/components/===
-DemandDetailDrawer.tsx[EU5L]: F:Implements DemandDetailDrawer.tsx | R:- | A:- | S:663L
+DemandDetailDrawer.tsx[EU5L]: F:需求计划详情抽屉 | R:code:riveredge-frontend/src/apps/kuaizhizao/pages/plan-management/demand-management/index.tsx | A:DemandDetailDrawer | S:挂载CustomFieldsDetailSection读自定义字段
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaizhizao/pages/plan-management/demand-management/===
-index.tsx[EU5L]: F:需求计划页仅管理手工需求计划（demand_plan） | R:- | A:- | S:1499L; 需求计划页仅管理手工需求计划（demand_plan）
+index.tsx[EU6L]: F:需求计划列表与新建编辑 | R:code:riveredge-frontend/src/components/custom-fields/CustomFieldsFormSection.tsx | A:- | S:useCustomFields挂载apps_kuaizhizao_demands; 保存读写自定义字段值
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/apps/kuaizhizao/pages/plan-management/demand-replan-dashboard/===
 index.tsx[EU5L]: F:eslint-disable-next-line react-hooks/exhaustive-deps -- refresh on seed only | R:- | A:- | S:942L
@@ -7057,7 +7060,7 @@ ApprovalFlowPreview.tsx[EU5S]: F:Implements ApprovalFlowPreview.tsx | R:- | A:- 
 AuditPhaseBadge.tsx[EU5T]: F:Implements AuditPhaseBadge.tsx | R:- | A:- | S:87L
 DetailAuditPhaseRow.tsx[EU5T]: F:Implements DetailAuditPhaseRow.tsx | R:- | A:- | S:65L
 UniAuditAdvancedActionModal.tsx[EU5S]: F:Implements UniAuditAdvancedActionModal.tsx | R:- | A:- | S:119L
-UniAuditModal.tsx[EU5L]: F:Implements UniAuditModal.tsx | R:- | A:- | S:1032L
+UniAuditModal.tsx[EU7L]: F:统一审核弹窗hub与action | R:code:riveredge-frontend/src/services/approvalInstance.ts | A:UniAuditModal | S:有审批实例时非本节点待办人禁用审核驳回并提示可审核人员; 勿误报无RBAC权限
 index.tsx[EU5L]: F:Implements index.tsx | R:- | A:- | S:596L
 types.ts[EU5T]: F:Implements types.ts | R:- | A:- | S:28L
 
@@ -7353,12 +7356,12 @@ useUserPreferenceQuery.ts[EU5T]: F:Implements useUserPreferenceQuery.ts | R:- | 
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/layouts/===
 AiAssistantHeaderButton.tsx[EU5T]: F:Implements AiAssistantHeaderButton.tsx | R:- | A:- | S:35L
-BasicLayout.tsx[EU5L]: F:PC主布局与侧栏菜单 | R:code:riveredge-frontend/src/layouts/basicLayout/sidebarMenuLayout.ts | A:BasicLayout | S:i18n失败安全hook; 定制应用菜单与宿主替换共存
+BasicLayout.tsx[EU6L]: F:PC主布局与侧栏菜单 | R:code:riveredge-frontend/src/layouts/basicLayout/sidebarMenuLayout.ts | A:BasicLayout | S:定制应用菜单与宿主替换共存; i18n失败安全hook
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/layouts/basicLayout/===
 LayoutStyleInjector.tsx[EU5T]: F:Implements LayoutStyleInjector.tsx | R:- | A:- | S:35L
 SplitSidebarMenu.tsx[EU5S]: F:Implements SplitSidebarMenu.tsx | R:- | A:- | S:197L
-buildInlineLayoutStyles.ts[EU5L]: F:主题切换：仅掐断布局壳常见层的过渡。避免使用全文档星号通配选择器及 ant-layout 下全后代通配，否则样式引擎需遍历巨量节点，易严重掉帧 | R:- | A:- | S:2915L
+buildInlineLayoutStyles.ts[EU5L]: F:布局壳内联主题样式生成 | R:code:riveredge-frontend/src/layouts/BasicLayout.tsx | A:buildInlineLayoutStyles | S:禁全文档星号通配掐断过渡以免样式引擎巨量遍历掉帧
 sidebarMenuDensity.ts[EU5T]: F:Implements sidebarMenuDensity.ts | R:- | A:- | S:14L
 sidebarMenuLayout.ts[EU5M]: F:侧栏菜单路径与分组规范化 | R:- | A:- | S:防ProLayout把#app-group收成/#app-group; 保留hash分组
 sidebarSearchBgFollow.ts[EU5T]: F:Implements sidebarSearchBgFollow.ts | R:- | A:- | S:14L
@@ -7441,7 +7444,7 @@ build-provenance-summary.tsx[EU5T]: F:Implements build-provenance-summary.tsx | 
 index.tsx[EU5S]: F:Implements index.tsx | R:- | A:- | S:133L
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/pages/infra/admin/settings/===
-index.tsx[EU5L]: F:LOGO上传相关状态 | R:- | A:- | S:1005L; LOGO上传相关状态
+index.tsx[EU5L]: F:平台管理设置页 | R:code:riveredge-frontend/src/services/platformSettings.ts | A:- | S:含是否接受搜索引擎收录开关; 默认开
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/pages/infra/client-releases/===
 ClientMiniprogramQrModal.tsx[EU5S]: F:Implements ClientMiniprogramQrModal.tsx | R:- | A:- | S:195L
@@ -7502,7 +7505,7 @@ index.tsx[EU5L]: F:固定主题颜色（不受全局主题影响） | R:- | A:- 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/pages/login/===
 RegisterDrawer.tsx[EU5L]: F:Implements RegisterDrawer.tsx | R:- | A:- | S:416L
 index.less[DU5L]: F:/* 登录页面样式 */ .login-container { display: flex; min-height: 100vh; /* 背景色通过内联样... | R:- | A:- | S:714L
-index.tsx[EU5L]: F:直连文件，避免 barrel 连带 login-page-editor 其它重模块（如 ReactQuill） | R:- | A:- | S:2581L
+index.tsx[EU5L]: F:登录MPA页 | R:code:riveredge-frontend/src/utils/searchEngineIndexing.ts | A:- | S:公开设置驱动meta robots; 直连文件避免barrel带入重模块
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/pages/login/components/===
 LoginQuickSocialButtons.tsx[EU5S]: F:Implements LoginQuickSocialButtons.tsx | R:- | A:- | S:157L
@@ -7912,13 +7915,13 @@ operationLog.ts[EU5T]: F:Implements operationLog.ts | R:- | A:- | S:82L
 optimizationSuggestion.ts[EU5T]: F:Implements optimizationSuggestion.ts | R:- | A:- | S:83L
 permission.ts[EU5T]: F:Implements permission.ts | R:- | A:- | S:77L
 permissionPolicy.ts[EU5T]: F:Implements permissionPolicy.ts | R:- | A:- | S:6L
-platformSettings.ts[EU5M]: F:仅用于前端兜底（后端不可用时），避免生产每次刷新都动态变化 | R:- | A:- | S:299L; 仅用于前端兜底（后端不可用时），避免生产每次刷新都动态变化
+platformSettings.ts[IU5M]: F:平台设置管理端API客户端 | R:code:riveredge-backend/src/infra/schemas/platform_settings.py | A:- | S:类型含search_engine_indexing_enabled; 后端不可用时前端兜底勿动态乱变
 position.ts[EU5S]: F:Implements position.ts | R:- | A:- | S:170L
 printDevice.ts[EU5S]: F:Implements printDevice.ts | R:- | A:- | S:140L
 printTemplate.ts[EU5M]: F:Implements printTemplate.ts | R:- | A:- | S:200L
 privateFileVault.ts[EU5T]: F:Implements privateFileVault.ts | R:- | A:- | S:96L
 publicAuth.ts[EU5M]: F:Implements publicAuth.ts | R:- | A:- | S:226L
-publicPlatformSettings.ts[EU5T]: F:Implements publicPlatformSettings.ts | R:- | A:- | S:67L
+publicPlatformSettings.ts[IU5T]: F:公开平台设置拉取 | R:code:riveredge-backend/src/infra/api/platform_settings/public.py | A:- | S:无鉴权; 含search_engine_indexing_enabled供登录与meta
 qrcode.ts[EU5M]: F:Implements qrcode.ts | R:- | A:- | S:232L
 realtime.ts[EU5T]: F:Implements realtime.ts | R:- | A:- | S:50L
 register.ts[EU5S]: F:Implements register.ts | R:- | A:- | S:154L
@@ -8128,6 +8131,7 @@ webauthn.ts[EU5S]: F:Implements webauthn.ts | R:- | A:- | S:101L
 wecomAuth.ts[EU5T]: F:Implements wecomAuth.ts | R:- | A:- | S:51L
 yieldToMain.ts[EU5T]: F:Implements yieldToMain.ts | R:- | A:- | S:17L
 dedicatedHostPathMap.ts[KB3T]: F:Implements dedicatedHostPathMap.ts | R:- | A:hostMenuPathToDedicatedRest,dedicatedRestToHostAppPageDir | S:Implements dedicatedHostPathMap.ts
+searchEngineIndexing.ts[CU4T]: F:按平台设置写页面meta robots | R:code:riveredge-frontend/src/services/publicPlatformSettings.ts | A:applySearchEngineIndexing | S:enabled!==false写index,follow否则noindex,nofollow; SSR无document时noop
 
 ===D:/kuaigeyun-pro/kuaigeyun/riveredge-frontend/src/utils/generated/===
 codeRulePageRegistry.ts[EU5T]: F:Implements codeRulePageRegistry.ts | R:- | A:- | S:7L
