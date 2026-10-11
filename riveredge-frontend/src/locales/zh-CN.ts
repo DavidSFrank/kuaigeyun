@@ -30798,6 +30798,10 @@ export default {
     '修复工作台加载完成后再闪一下',
   'pages.dashboard.updateLog.entries.workplace-weather-15s-flash-r01.description':
     '天气在站点位置就绪前就请求，Open-Meteo 失败后还会再查地理编码和 wttr.in，三段超时约 15 秒才返回，日历天空背景随之重绘。现等位置配置完成且只请求 Open-Meteo，已有天气时不再换成加载中。',
+  'pages.dashboard.updateLog.entries.approval-countersign-my-pending-task-r01.title':
+    '修复会签时审批中心不显示同意/拒绝按钮',
+  'pages.dashboard.updateLog.entries.approval-countersign-my-pending-task-r01.description':
+    '实例列表按当前用户是否有待办任务判断操作按钮；会签成员不再因仅记录首位审批人而看不到同意/拒绝/转交。',
   'pages.dashboard.updateLog.entries.gitee-oauth-drop-projects-scope-r01.title':
     '修复生产环境 Gitee 授权提示请求范围无效',
   'pages.dashboard.updateLog.entries.gitee-oauth-drop-projects-scope-r01.description':
