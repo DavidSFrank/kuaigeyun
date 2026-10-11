@@ -44,6 +44,13 @@ export const PLATFORM_UPDATE_TYPE_ORDER: PlatformUpdateType[] = [
  */
 export const PLATFORM_UPDATE_LOG_GENERAL: PlatformUpdateLogEntry[] = [
   {
+    id: 'workbuddy-mcp-host-only-r01',
+    date: '2026-10-11',
+    type: 'improvement',
+    titleKey: 'pages.dashboard.updateLog.entries.workbuddy-mcp-host-only-r01.title',
+    descriptionKey: 'pages.dashboard.updateLog.entries.workbuddy-mcp-host-only-r01.description',
+  },
+  {
     id: 'infra-open-api-workbuddy-preset-r01',
     date: '2026-10-11',
     type: 'feature',

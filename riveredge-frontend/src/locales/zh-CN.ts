@@ -5981,6 +5981,10 @@ export default {
   'app.kuaiai.settings.workbuddyEnabled': '启用实验室通道',
   'app.kuaiai.settings.workbuddyMcpUrl': 'MCP 公网地址',
   'app.kuaiai.settings.workbuddyMcpUrlExtra': 'Sidecar 对外 HTTPS 地址，保存后复制到 WorkBuddy 企业连接器。',
+  'app.kuaiai.settings.workbuddyMcpHost': 'MCP 公网域名',
+  'app.kuaiai.settings.workbuddyMcpHostRequired': '请输入 MCP 公网域名',
+  'app.kuaiai.settings.workbuddyMcpHostExtra':
+    '仅填域名或主机（可含端口）；保存时自动拼接 https 与固定路径 {{path}}，完整地址可复制到 WorkBuddy。',
   'app.kuaiai.settings.workbuddyNotes': '备注',
   'app.kuaiai.settings.workbuddyNotesPlaceholder': '选填',
   'app.kuaiai.settings.workbuddySteps':
@@ -30760,6 +30764,10 @@ export default {
     'Gitee 快捷登录可读取邮箱并支持个人资料绑定',
   'pages.dashboard.updateLog.entries.gitee-oauth-email-scope-bind-r01.description':
     '授权范围增加 emails，并在公开邮箱为空时从邮箱列表取主邮箱以自动匹配系统用户；个人资料补充 Gitee 授权绑定与解绑入口。',
+  'pages.dashboard.updateLog.entries.workbuddy-mcp-host-only-r01.title':
+    'WorkBuddy 连接器 MCP 改为仅填域名',
+  'pages.dashboard.updateLog.entries.workbuddy-mcp-host-only-r01.description':
+    '应用连接器 WorkBuddy 仅填写公网域名，系统自动拼接 https 与固定 /mcp 路径；组织域名保留字增加 mcp，避免与 Sidecar 路径冲突。',
   'pages.dashboard.updateLog.entries.infra-open-api-workbuddy-preset-r01.title': '开放平台一键预置 WorkBuddy 只读应用',
   'pages.dashboard.updateLog.entries.infra-open-api-workbuddy-preset-r01.description':
     '对接应用工具栏可预置「WorkBuddy（实验室）」开放应用，自动勾选销售订单、工单与库存只读授权；鉴权说明按钮移至工具栏末尾。',
