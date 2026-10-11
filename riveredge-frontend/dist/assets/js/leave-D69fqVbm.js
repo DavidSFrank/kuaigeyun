@@ -1,1 +1,0 @@
-import{k as t,a as u,b as o,c as q,d as c}from"./kuaioaApi-Ds-Xt3aA.js";const s="/apps/kuaioa/leave",r=e=>q(`${s}/requests`,e),$=e=>c(`${s}/requests/${e}`),k=e=>o(`${s}/requests`,e),n=(e,a)=>u(`${s}/requests/${e}`,a),v=e=>t(`${s}/requests/${e}`);export{k as c,v as d,$ as g,r as l,n as u};

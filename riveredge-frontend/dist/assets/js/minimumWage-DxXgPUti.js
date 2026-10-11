@@ -1,0 +1,1 @@
+import{k as s,a as e,b as t,c as n,d as m}from"./kuaioaApi-DDLGeFV4.js";const i="/apps/kuaioa/minimum-wage",g=()=>n(i),c=a=>m(`${i}/${a}`),k=a=>t(i,a),f=(a,o)=>e(`${i}/${a}`,o),$=a=>s(`${i}/${a}`);export{k as c,$ as d,c as g,g as l,f as u};
