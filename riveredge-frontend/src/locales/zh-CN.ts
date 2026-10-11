@@ -30764,6 +30764,14 @@ export default {
     'Gitee 快捷登录可读取邮箱并支持个人资料绑定',
   'pages.dashboard.updateLog.entries.gitee-oauth-email-scope-bind-r01.description':
     '授权范围增加 emails，并在公开邮箱为空时从邮箱列表取主邮箱以自动匹配系统用户；个人资料补充 Gitee 授权绑定与解绑入口。',
+  'pages.dashboard.updateLog.entries.workbuddy-mcp-caddy-path-b-r01.title':
+    '生产 Caddy 支持主站 /mcp 反代 WorkBuddy Sidecar',
+  'pages.dashboard.updateLog.entries.workbuddy-mcp-caddy-path-b-r01.description':
+    'fast-deploy 可启用 WORKBUDDY_MCP_ENABLE，将 https://域名/mcp 反代至本机 Sidecar（streamable-http），避免落入前端 HTML；含 systemd 单元与 workbuddy-mcp.env 模板。',
+  'pages.dashboard.updateLog.entries.personal-profile-wecom-gitee-contact-r01.title':
+    '个人资料联系方式完善企微与 Gitee',
+  'pages.dashboard.updateLog.entries.personal-profile-wecom-gitee-contact-r01.description':
+    '企业微信卡片支持手动填写账号并随资料保存；新增 Gitee 授权绑定与解绑，便于登录页快捷登录。',
   'pages.dashboard.updateLog.entries.workbuddy-mcp-host-only-r01.title':
     'WorkBuddy 连接器 MCP 改为仅填域名',
   'pages.dashboard.updateLog.entries.workbuddy-mcp-host-only-r01.description':
