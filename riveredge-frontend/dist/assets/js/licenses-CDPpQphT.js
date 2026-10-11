@@ -1,0 +1,1 @@
+import{k as c,a as n,b as o,c as e,d as t}from"./kuaioaApi-CvXH6koY.js";const s="/apps/kuaioa/licenses",l=a=>e(s,a),u=(a=30)=>e(`${s}/expiring`,{within_days:a}),k=a=>o(s,a),m=(a,i)=>n(`${s}/${a}`,i),L=a=>c(`${s}/${a}`),$=a=>t(`${s}/${a}`);export{l as a,k as c,L as d,$ as g,u as l,m as u};
