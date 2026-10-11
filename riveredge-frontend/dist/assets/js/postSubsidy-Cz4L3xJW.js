@@ -1,1 +1,0 @@
-import{k as o,a as i,b as u,c as e,d}from"./kuaioaApi-CvXH6koY.js";const a="/apps/kuaioa/post-subsidies",b=s=>e(a,s),k=s=>d(`${a}/${s}`),P=s=>u(a,s),n=(s,t)=>i(`${a}/${s}`,t),p=s=>o(`${a}/${s}`);export{P as c,p as d,k as g,b as l,n as u};
