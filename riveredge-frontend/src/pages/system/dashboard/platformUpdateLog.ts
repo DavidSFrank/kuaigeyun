@@ -44,6 +44,81 @@ export const PLATFORM_UPDATE_TYPE_ORDER: PlatformUpdateType[] = [
  */
 export const PLATFORM_UPDATE_LOG_GENERAL: PlatformUpdateLogEntry[] = [
   {
+    id: 'infra-open-api-workbuddy-preset-r01',
+    date: '2026-10-11',
+    type: 'feature',
+    titleKey: 'pages.dashboard.updateLog.entries.infra-open-api-workbuddy-preset-r01.title',
+    descriptionKey: 'pages.dashboard.updateLog.entries.infra-open-api-workbuddy-preset-r01.description',
+  },
+  {
+    id: 'infra-open-api-layout-r01',
+    date: '2026-10-11',
+    type: 'improvement',
+    titleKey: 'pages.dashboard.updateLog.entries.infra-open-api-layout-r01.title',
+    descriptionKey: 'pages.dashboard.updateLog.entries.infra-open-api-layout-r01.description',
+  },
+  {
+    id: 'workbuddy-connector-form-copy-r01',
+    date: '2026-10-11',
+    type: 'improvement',
+    titleKey: 'pages.dashboard.updateLog.entries.workbuddy-connector-form-copy-r01.title',
+    descriptionKey: 'pages.dashboard.updateLog.entries.workbuddy-connector-form-copy-r01.description',
+  },
+  {
+    id: 'kuaiai-workbuddy-application-connector-r01',
+    date: '2026-10-11',
+    type: 'improvement',
+    titleKey: 'pages.dashboard.updateLog.entries.kuaiai-workbuddy-application-connector-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.kuaiai-workbuddy-application-connector-r01.description',
+  },
+  {
+    id: 'kuaiai-settings-no-ocr-card-r01',
+    date: '2026-10-11',
+    type: 'improvement',
+    titleKey: 'pages.dashboard.updateLog.entries.kuaiai-settings-no-ocr-card-r01.title',
+    descriptionKey: 'pages.dashboard.updateLog.entries.kuaiai-settings-no-ocr-card-r01.description',
+  },
+  {
+    id: 'kuaiai-ocr-application-connector-r01',
+    date: '2026-10-11',
+    type: 'improvement',
+    titleKey: 'pages.dashboard.updateLog.entries.kuaiai-ocr-application-connector-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.kuaiai-ocr-application-connector-r01.description',
+  },
+  {
+    id: 'kuaiai-bridge-workbuddy-lab-r01',
+    date: '2026-10-11',
+    type: 'feature',
+    titleKey: 'pages.dashboard.updateLog.entries.kuaiai-bridge-workbuddy-lab-r01.title',
+    descriptionKey: 'pages.dashboard.updateLog.entries.kuaiai-bridge-workbuddy-lab-r01.description',
+  },
+  {
+    id: 'workplace-weather-manual-region-r01',
+    date: '2026-10-11',
+    type: 'fix',
+    titleKey: 'pages.dashboard.updateLog.entries.workplace-weather-manual-region-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.workplace-weather-manual-region-r01.description',
+  },
+  {
+    id: 'workplace-weather-no-refetch-stall-r01',
+    date: '2026-10-11',
+    type: 'fix',
+    titleKey: 'pages.dashboard.updateLog.entries.workplace-weather-no-refetch-stall-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.workplace-weather-no-refetch-stall-r01.description',
+  },
+  {
+    id: 'workplace-weather-15s-flash-r01',
+    date: '2026-10-11',
+    type: 'fix',
+    titleKey: 'pages.dashboard.updateLog.entries.workplace-weather-15s-flash-r01.title',
+    descriptionKey:
+      'pages.dashboard.updateLog.entries.workplace-weather-15s-flash-r01.description',
+  },
+  {
     id: 'gitee-oauth-drop-projects-scope-r01',
     date: '2026-10-11',
     type: 'fix',

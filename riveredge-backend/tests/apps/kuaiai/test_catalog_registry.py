@@ -8,7 +8,7 @@ from apps.kuaiai.catalog.capabilities import CAPABILITY_SPECS, get_capability_sp
 
 class TestCatalogRegistry:
     def test_capability_count(self):
-        assert len(CAPABILITY_SPECS) == 8
+        assert len(CAPABILITY_SPECS) == 9
 
     def test_agent_count(self):
         from apps.kuaiai.catalog.agents import AGENT_SPECS
@@ -17,6 +17,7 @@ class TestCatalogRegistry:
 
     def test_get_capability_spec(self):
         assert get_capability_spec("ask") is not None
+        assert get_capability_spec("bridge") is not None
         assert get_capability_spec("missing") is None
 
     def test_get_agent_spec(self):

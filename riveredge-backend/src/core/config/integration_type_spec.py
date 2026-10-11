@@ -26,6 +26,7 @@ APPLICATION_CONNECTOR_TYPES: tuple[str, ...] = (
     "feishu",
     "dingtalk",
     "wecom",
+    "kuaiai_workbuddy",
     "kingdee_galaxy",
     "kingdee_cosmic",
     "kingdee_xingchen",
@@ -91,6 +92,7 @@ APPLICATION_CONNECTOR_TYPES: tuple[str, ...] = (
     "kdniao",
     "aliyun_market",
     "tencent_market",
+    "kuaiai_ocr",
     "deepseek",
     "openai",
     "qwen",
@@ -123,6 +125,8 @@ _NON_BUSINESS_SYSTEM_CONNECTOR_TYPES: frozenset[str] = frozenset(
         "kdniao",
         "aliyun_market",
         "tencent_market",
+        "kuaiai_ocr",
+        "kuaiai_workbuddy",
     }
 )
 

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-10-07T06:04:21Z",
-  "updated_at": "2026-10-10T19:49:58Z",
+  "updated_at": "2026-10-11T01:02:39Z",
   "files": {
     ".cursor/rules/ai-memory.mdc": {
       "role": "index",
@@ -77,9 +77,9 @@
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "9b3dacc20f8e3478c2f64b207280b4cb3daae4a1f5fe778f50f4b477b6841629",
-      "size": 1001710,
-      "normalized_sha256": "9b3dacc20f8e3478c2f64b207280b4cb3daae4a1f5fe778f50f4b477b6841629"
+      "sha256": "2e01ec1bc2bf7394da6767793e2a18b67d5503595828762e1056d6c15c8c29a5",
+      "size": 1002369,
+      "normalized_sha256": "2e01ec1bc2bf7394da6767793e2a18b67d5503595828762e1056d6c15c8c29a5"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -34827,9 +34827,9 @@
     },
     "riveredge-frontend/src/components/weather/WeatherWidget.tsx": {
       "role": "index",
-      "sha256": "f494f85dfabc72a264d4a04223b69f1996fcec9036ede92d8ffaf3a854dda1dd",
-      "size": 9217,
-      "normalized_sha256": "90e8bddea90a2300258a54b9e677641fdcb0baf21f8cf4e10eaa6bb16a39a1ae"
+      "sha256": "1863d398054d627d0a4dd4353ba818bb88b05fabd224a32c68f982f0c3d4b76c",
+      "size": 10300,
+      "normalized_sha256": "1863d398054d627d0a4dd4353ba818bb88b05fabd224a32c68f982f0c3d4b76c"
     },
     "riveredge-frontend/src/components/weather/weatherBackground.ts": {
       "role": "index",
@@ -34995,9 +34995,9 @@
     },
     "riveredge-frontend/src/global.less": {
       "role": "index",
-      "sha256": "3f197b420831a2c0113f4613364f30be24275458f6d5c17d65de66441db0e0e9",
-      "size": 116918,
-      "normalized_sha256": "3f197b420831a2c0113f4613364f30be24275458f6d5c17d65de66441db0e0e9"
+      "sha256": "651b05950ce09309a312840d562604124ccaac763af92173aec1a40d6cc3e77d",
+      "size": 116882,
+      "normalized_sha256": "651b05950ce09309a312840d562604124ccaac763af92173aec1a40d6cc3e77d"
     },
     "riveredge-frontend/src/hooks/index.ts": {
       "role": "index",
@@ -36321,9 +36321,9 @@
     },
     "riveredge-frontend/src/pages/system/dashboard/platformUpdateLog.ts": {
       "role": "index",
-      "sha256": "0249a52e9f4a5768cf1a25924ede464ded6b2bbf05bd147ae3737496bb82114e",
-      "size": 513242,
-      "normalized_sha256": "e7ef68df43b1f83b39f6e91303a077d5125029c325f20995b1d8ccabe52a1313"
+      "sha256": "60818aa2015d1357ad2f0e2f781ab0a122f66217c7154f6c366c2549bc653f08",
+      "size": 514166,
+      "normalized_sha256": "c4c41f351d0bd8e61c97a2b4523b2b9e414309c9cbcbe90517978be35ec43bb1"
     },
     "riveredge-frontend/src/pages/system/dashboard/platformUpdateLogDedicated.ts": {
       "role": "index",
@@ -37455,9 +37455,9 @@
     },
     "riveredge-frontend/src/services/weather.ts": {
       "role": "index",
-      "sha256": "d4d71c741cb27427627cb5ee4ccd1fe92c4c9c762650b8ee9088d308178d57fb",
-      "size": 15113,
-      "normalized_sha256": "684adf0a728b8065efd732534cdc451fe84d6d49f3d6f03fdfdd55145a8f7a2e"
+      "sha256": "a61036b92797208d4f2428a398915e54d30232a015dd6d7c301e8ff4aeca7e02",
+      "size": 15670,
+      "normalized_sha256": "a61036b92797208d4f2428a398915e54d30232a015dd6d7c301e8ff4aeca7e02"
     },
     "riveredge-frontend/src/stores/configStore.ts": {
       "role": "index",
